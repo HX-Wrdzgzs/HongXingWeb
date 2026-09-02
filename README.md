@@ -20,6 +20,7 @@ Hong Xing 技术 / 项目 / 服务官网。
 - `lifecycle.html` 生命周期
 - `support.html` 支持与下载
 - `about.html` 关于
+- `404.html` 自定义 404
 
 ## 动画与交互
 
@@ -40,3 +41,7 @@ Hong Xing 技术 / 项目 / 服务官网。
 - Build command：留空
 - Build output directory：`/`
 - Production branch：`main`
+
+## 当前状态
+
+页面结构、交互逻辑和公开文案已落地；后续新增图片、固件下载入口或设备兼容信息时，应只使用已确认素材与可核实数据。
