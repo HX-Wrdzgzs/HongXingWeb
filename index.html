@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="首页 — Hong Xing 技术、项目、服务与更新信息。">
+  <title>首页 | Hong Xing</title>
+  <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-page="home">
+<div class="scroll-progress" aria-hidden="true"></div>
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html" aria-label="Hong Xing 首页"><span class="brand-dot" aria-hidden="true"></span><span>Hong Xing</span></a>
+    <nav class="nav-links" aria-label="主导航">
+      <a data-nav="home" href="index.html">首页</a>
+      <a data-nav="projects" href="projects.html">项目与服务</a>
+      <a data-nav="infrastructure" href="infrastructure.html">基础设施</a>
+      <a data-nav="updates" href="updates.html">更新公告</a>
+      <a data-nav="ecosystem" href="ecosystem.html">生态关联</a>
+      <a data-nav="lifecycle" href="lifecycle.html">生命周期</a>
+      <a data-nav="support" href="support.html">支持与下载</a>
+      <a data-nav="about" href="about.html">关于</a>
+    </nav>
+    <div class="nav-tools">
+      <button class="icon-btn" data-theme-toggle aria-label="切换主题">◐</button>
+      <button class="menu-btn" aria-label="打开菜单" aria-expanded="false">≡</button>
+    </div>
+  </div>
+</header>
+<nav class="mobile-nav" aria-label="移动端导航">
+  <a href="index.html">首页</a>
+  <a href="projects.html">项目与服务</a>
+  <a href="infrastructure.html">基础设施</a>
+  <a href="updates.html">更新公告</a>
+  <a href="ecosystem.html">生态关联</a>
+  <a href="lifecycle.html">生命周期</a>
+  <a href="support.html">支持与下载</a>
+  <a href="about.html">关于</a>
+</nav>
+<main>
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-mark-wrap" data-reveal>
+      <div class="hero-mark-glow"></div>
+      <img class="hero-mark" data-tilt src="assets/img/hongxing-mark.webp" alt="Hong Xing 红色立体标志">
+    </div>
+    <div class="hero-copy">
+      <span class="eyebrow">Hong Xing · 2026</span>
+      <h1><span class="hong">Hong</span><span>Xing</span></h1>
+      <p class="slogan">构建、连接，也持续维护。</p>
+      <p class="desc">这里记录 Hong Xing 当前维护的系统、固件、认证与在线服务，也记录基础设施迁移、兼容性调整和后续版本计划。</p>
+      <div class="hero-actions">
+        <a class="btn red" href="projects.html">查看项目与服务 <span>→</span></a>
+        <a class="btn ghost" href="updates.html">查看最新公告</a>
+      </div>
+      <div class="hero-facts">
+        <div class="fact"><strong>持续维护</strong><span>系统与服务按实际状态更新</span></div>
+        <div class="fact"><strong>迁移进行中</strong><span>苏州相关服务逐步向南京迁移</span></div>
+        <div class="fact"><strong>兼容计划</strong><span>O3 继续执行向下兼容安排</span></div>
+        <div class="fact"><strong>状态可追溯</strong><span>通过公告与生命周期页面记录</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">Scroll to explore</div>
+</section>
+
+<section class="section" id="projects">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div><span class="section-kicker">Projects & Services</span><h2 class="section-title">正在维护的项目与服务</h2></div>
+      <p class="section-lead">不把任何单一项目放在绝对主导位置。HongXingOS、O3 Framework、AuthLit 与 HX Online2 分别承担不同方向的工作。</p>
+    </div>
+    <div class="project-deck">
+      <a class="project-card" href="projects.html#hongxingos"><span class="num">01</span><h3>HongXingOS</h3><p>系统与设备软件方向，继续维护兼容、更新和生命周期安排。</p><div class="card-link"><span>查看项目</span><span>↗</span></div></a>
+      <a class="project-card" href="projects.html#o3"><span class="num">02</span><h3>O3 Framework</h3><p>固件、启动流程、后台服务调度、最小预加载及相关优化。</p><div class="card-link"><span>查看 O3</span><span>↗</span></div></a>
+      <a class="project-card" href="projects.html#authlit"><span class="num">03</span><h3>AuthLit</h3><p>身份认证、状态检测、异常响应与安全服务相关能力。</p><div class="card-link"><span>查看 AuthLit</span><span>↗</span></div></a>
+      <a class="project-card" href="projects.html#online2"><span class="num">04</span><h3>HX Online2</h3><p>在线服务连接、恢复与请求路径调度，包括 Quick Services。</p><div class="card-link"><span>查看 Online2</span><span>↗</span></div></a>
+    </div>
+  </div>
+</section>
+
+<section class="section compact">
+  <div class="wrap">
+    <div class="news-grid" data-reveal>
+      <div class="news-intro"><span class="section-kicker">Latest</span><h3>最新动态</h3><p class="muted">仅展示近期、可核实的更新。</p><a class="link-arrow" href="updates.html">查看全部公告</a></div>
+      <a class="news-item" href="updates.html"><span class="news-date">2026.08.31</span><h4>苏州网络机房开始向南京地区迁移</h4><p>原苏州网络机房将在一周内开始迁移，后续服务与数据整体迁移预计持续 1–2 周。</p></a>
+      <a class="news-item" href="updates.html"><span class="news-date">2026.08.12</span><h4>HongXing O3 固件发布</h4><p>面向受支持版本陆续推送，并正式集成 HX Online2 Quick Services。</p></a>
+      <a class="news-item" href="updates.html"><span class="news-date">2026.08</span><h4>o3u2 / o3u7 兼容性问题已重新发版</h4><p>部分旧款 Intel 网卡无法识别的问题已处理，最新更新识别代码为 9BF2。</p></a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="migration">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div><span class="section-kicker">Infrastructure</span><h2 class="section-title">基础设施与服务迁移</h2></div>
+      <p class="section-lead">此次迁移不使用虚构百分比。当前公开状态为“迁移进行中”，具体部署地点仍以最新公告为准。</p>
+    </div>
+    <div class="migration" data-reveal>
+      <div class="place"><small>原网络机房</small><h3>SUZHOU</h3><ul><li>现有服务逐步迁移</li><li>后续不再作为主要发展区域</li></ul></div>
+      <div class="route"><div class="route-arrows">›››</div><div class="route-line"></div><strong>迁移进行中</strong><small>服务与数据整体迁移预计 1–2 周</small></div>
+      <div class="place"><small>新核心区域</small><h3>NANJING</h3><ul><li>承载现有服务基础设施</li><li>提供备用下载与资源分发能力</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="ecosystem">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div><span class="section-kicker">Connected Ecosystem</span><h2 class="section-title">生态关联</h2></div>
+      <p class="section-lead">当前先只展示你已经提供素材、并且有公开关系说明的 Amia_晓山瑞希，不额外虚构其他项目图片。</p>
+    </div>
+    <div class="eco-feature" data-reveal>
+      <div class="eco-image"><img src="assets/img/amia-mizuki.webp" alt="Amia_晓山瑞希 项目形象"></div>
+      <div class="eco-copy">
+        <span class="section-kicker">Amia_晓山瑞希</span>
+        <h3>服务已接入<br>南京网络机房。</h3>
+        <p>根据 2026 年 8 月 31 日技术调整公告，Amia_晓山瑞希旗下全部服务已正式接入 Hong Xing（南京）网络机房。后续相关服务与数据将继续完成整体迁移。</p>
+        <div class="eco-links"><a class="btn" href="https://help.mizuki.top/" target="_blank" rel="noreferrer">帮助文档 ↗</a><a class="btn ghost" href="ecosystem.html">了解关联</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="lifecycle">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div><span class="section-kicker">Lifecycle</span><h2 class="section-title">版本与生命周期</h2></div>
+      <p class="section-lead">这里展示目前最新公告中明确提到的 O2、O3 与 HongXingOS 7 关系，不补写未公开版本。</p>
+    </div>
+    <div class="life-track" data-reveal>
+      <div class="life-progress"></div>
+      <div class="life-node"><div class="life-badge">O2</div><h4>现有旧版固件</h4><p>计划于 2027 年停止服务与维护；具体日期及受影响范围以后续生命周期公告为准。</p></div>
+      <div class="life-node current"><div class="life-badge">O3</div><h4>当前推进版本</h4><p>2026 年 8 月起面向全部受支持版本陆续推送，并继续执行现有向下兼容计划。</p></div>
+      <div class="life-node"><div class="life-badge">HongXingOS 7</div><h4>下一阶段</h4><p>O3 计划作为默认固件集成至预计 2026 年 10 月发布的 HongXingOS 7。</p></div>
+    </div>
+    <div style="margin-top:46px"><a class="link-arrow" href="lifecycle.html">查看完整生命周期说明</a></div>
+  </div>
+</section>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="brand"><span class="brand-dot" aria-hidden="true"></span><span>Hong Xing</span></div>
+        <p>记录正在维护的系统、固件、认证、在线服务与基础设施调整。公开状态以最新公告为准。</p>
+      </div>
+      <div class="footer-col"><h4>导航</h4>
+        <a href="projects.html">项目与服务</a><a href="updates.html">更新公告</a><a href="lifecycle.html">生命周期</a>
+      </div>
+      <div class="footer-col"><h4>服务</h4>
+        <a href="infrastructure.html">基础设施</a><a href="ecosystem.html">生态关联</a><a href="support.html">支持与下载</a>
+      </div>
+      <div class="footer-col"><h4>外部入口</h4>
+        <a href="https://help.mizuki.top/" target="_blank" rel="noreferrer">MizukiBot 帮助文档 ↗</a>
+        <a href="https://help.mizuki.top/status" target="_blank" rel="noreferrer">服务状态 ↗</a>
+        <a href="https://github.com/HX-Wrdzgzs" target="_blank" rel="noreferrer">GitHub ↗</a>
+      </div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Hong Xing.</span><span>黑 · 白 · 红 / No video assets</span></div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="assets/js/site.js"></script>
+</body></html>
