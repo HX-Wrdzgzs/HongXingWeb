@@ -2,46 +2,27 @@
 
 Hong Xing 技术 / 项目 / 服务官网。
 
-## 设计原则
+## 当前实现
 
-- 仅使用黑、白、红作为站点 UI 主色。
-- 首页不把 HongXingOS 作为唯一主导项目。
-- 公开文案优先依据最新公告；历史状态冲突按时间顺序标注。
-- 不使用虚构用户量、SLA、全球节点、迁移百分比等未经确认的数据。
-- 当前图片素材仅包含 Hong Xing 立体标志与用户提供的 Amia_晓山瑞希项目形象。
+- 黑、白、红三色 UI；Amia_晓山瑞希项目形象保留原彩色素材。
+- 导航与 favicon 使用依据用户提供标志重建的 Hong Xing SVG，不再使用 CSS 伪造图标。
+- 首页标志不是平面“3D 效果图”：由同一 SVG 轮廓生成多层矢量结构，支持透视、指针倾斜与滚动联动。
+- 首页采用长滚动叙事：项目主线、O3 Quick Services、更新滑轨、基础设施迁移、Amia 关联与生命周期。
+- 完整页面：项目与服务、基础设施、更新公告、生态关联、生命周期、支持与下载、关于、404。
+- 更新公告支持搜索、分类筛选、分页、URL 查询状态、详情弹窗与 hash 深链接。
+- 移动端菜单、黑白主题、滚动进度、IntersectionObserver / GSAP 动画增强和 `prefers-reduced-motion` 降级。
 
-## 页面
+## 内容原则
 
-- `index.html` 首页
-- `projects.html` 项目与服务
-- `infrastructure.html` 基础设施
-- `updates.html` 更新公告（筛选 / 搜索 / 分页 / 详情弹窗）
-- `ecosystem.html` 生态关联
-- `lifecycle.html` 生命周期
-- `support.html` 支持与下载
-- `about.html` 关于
-- `404.html` 自定义 404
-
-## 动画与交互
-
-- 首屏 3D Logo 入场、视差与指针倾斜
-- GSAP + ScrollTrigger 滚动增强（CDN 不可用时有 IntersectionObserver 回退）
-- 页面切换淡出 / 淡入
-- 滚动进度条
-- 主题切换（黑 / 白）
-- 移动端全屏菜单
-- 公告筛选、搜索、分页、详情弹窗
-- 生命周期滚动进度动画
-- 基础设施迁移状态动效
+- 不把 HongXingOS 作为 Hong Xing 的唯一主导内容。
+- 不虚构用户量、SLA、全球节点、迁移百分比、下载地址或设备兼容清单。
+- 公开文案优先依据时间更晚的正式公告；历史状态冲突时保留时间线并说明后续变化。
+- 项目图片只使用用户确认或公开确认的素材。
 
 ## Cloudflare Pages
 
-这是纯静态站点，无构建步骤。
+纯静态站点，无构建步骤：
 
-- Build command：留空
-- Build output directory：`/`
-- Production branch：`main`
-
-## 当前状态
-
-页面结构、交互逻辑和公开文案已落地；后续新增图片、固件下载入口或设备兼容信息时，应只使用已确认素材与可核实数据。
+- Production branch: `main`
+- Build command: 留空
+- Build output directory: `/`
