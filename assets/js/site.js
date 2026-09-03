@@ -1,5 +1,6 @@
 (()=>{
 const d=document,root=d.documentElement,body=d.body,reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
+if(!d.querySelector('link[href*="mobile-polish.css"]')){const l=d.createElement('link');l.rel='stylesheet';l.href='assets/css/mobile-polish.css?v=20260903-1';d.head.appendChild(l)}
 const LOGO_PATHS=['M 179,16 L 169,38 L 152,93 L 153,97 L 193,96 L 208,45 L 212,40 L 217,40 L 221,46 L 237,97 L 277,96 L 256,27 L 251,18 L 242,9 L 228,2 L 209,0 L 193,5 Z','M 0,163 L 0,180 L 9,199 L 62,241 L 65,239 L 77,204 L 40,174 L 40,168 L 43,166 L 386,166 L 389,169 L 389,174 L 118,382 L 109,385 L 105,380 L 162,200 L 162,196 L 159,195 L 120,196 L 66,375 L 67,391 L 74,406 L 87,418 L 103,425 L 117,425 L 130,421 L 174,389 L 414,205 L 423,194 L 429,176 L 428,161 L 422,147 L 411,135 L 397,128 L 32,128 L 22,132 L 12,140 L 6,148 Z','M 340,300 L 307,326 L 323,376 L 323,382 L 320,385 L 311,382 L 274,353 L 267,355 L 240,376 L 289,415 L 309,425 L 324,425 L 342,418 L 354,407 L 362,390 L 362,369 Z'];
 function svg(fill='#e60012'){return `<svg viewBox="0 0 430 426" aria-hidden="true">${LOGO_PATHS.map(p=>`<path d="${p}" fill="${fill}"/>`).join('')}</svg>`}
 qsa('[data-brand-mark]').forEach(el=>el.innerHTML=svg());
