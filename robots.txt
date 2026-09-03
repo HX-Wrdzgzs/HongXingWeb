@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hx.mizuki.top/sitemap.xml
