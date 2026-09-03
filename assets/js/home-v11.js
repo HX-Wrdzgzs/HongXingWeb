@@ -1,6 +1,7 @@
 (()=>{
 'use strict';
 const d=document,qs=(s,c=d)=>c.querySelector(s),qsa=(s,c=d)=>[...c.querySelectorAll(s)];
+if(!qs('link[data-v12-polish]')){const l=d.createElement('link');l.rel='stylesheet';l.href='assets/css/home-v12-polish.css?v=20260904-1';l.dataset.v12Polish='';d.head.appendChild(l);}
 const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches,desktop=matchMedia('(min-width:761px)');
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const mark=qs('[data-v11-mark]');
