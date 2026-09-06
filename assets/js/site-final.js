@@ -1,1 +1,142 @@
-(()=>{const d=document,q=(s,c=d)=>c.querySelector(s),qa=(s,c=d)=>[...c.querySelectorAll(s)],reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;[['assets/css/approved-visual.css?v=20260906-6'],['assets/css/polish-v3.css?v=20260906-6'],['assets/css/hero-webgl.css?v=20260906-6'],['assets/css/infra-service.css?v=20260906-6']].forEach(([href])=>{const l=d.createElement('link');l.rel='stylesheet';l.href=href;d.head.appendChild(l)});qa('img').forEach(img=>{const src=img.getAttribute('src')||'';if(src.endsWith('suzhou-landmark.svg'))img.src='assets/img/suzhou-landmark.webp?v=20260906-6';if(src.endsWith('nanjing-landmark.svg'))img.src='assets/img/nanjing-landmark.webp?v=20260906-6';if(src.endsWith('hongxingos7-dev-preview.svg'))img.src='assets/img/hongxingos7-dev-preview.svg?v=20260906-6'});const replaceText=(el,from,to)=>{if(el&&el.textContent.includes(from))el.textContent=el.textContent.replace(from,to)};if(d.body.dataset.page==='home')q('.entry-strip')?.remove();qa('.migration-layout').forEach(box=>{const cards=qa('.city-card',box);if(cards[0]){q('.city-label strong',cards[0]).textContent='SUZHOU';q('.city-label span',cards[0]).textContent='苏州节点 · 相关服务迁移中'}if(cards[1]){q('.city-label strong',cards[1]).textContent='NANJING';q('.city-label span',cards[1]).textContent='南京主服务节点 · 承接迁移服务与资源'}const route=q('.route',box);if(route){const rs=q('strong',route),sm=q('small',route);if(rs)rs.textContent='服务迁移';if(sm)sm.textContent='苏州 → 南京'}const parent=box.parentElement;if(parent&&!parent.querySelector('.hx-continuous-service')){const svc=d.createElement('section');svc.className='hx-continuous-service reveal';svc.innerHTML=`<div class="hx-continuous-head"><div><small>CONTINUOUS SERVICE</small><h3>青海西宁既有机房</h3></div><p>西宁机房继续参与现有服务体系运行，不属于本次苏州至南京的迁移链路。</p></div><article class="hx-xining-card"><div class="hx-xining-copy"><span class="eyebrow">QINGHAI · XINING</span><h4>持续服务</h4><p>现有基础设施保持运行，继续承担既有服务职责。该节点与南京主服务节点共同支撑当前服务体系。</p></div><div class="hx-xining-model"><img src="assets/img/xining-datacenter.svg?v=20260906-6" alt="青海西宁既有机房基础设施模型"></div></article>`;parent.insertBefore(svc,parent.querySelector('.infra-note')||null)}});qa('.infra-note').forEach(n=>n.textContent='苏州相关服务正在迁入南京主服务节点；青海西宁既有机房持续运行，不属于本次迁移。图中苏州与南京建筑仅用于区分城市，不对应实际机房建筑或地址。');qa('p').forEach(p=>{replaceText(p,'2026 年下半年，Hong Xing 逐步结束苏州地区后续发展，将开发、技术、业务与服务资源向南京集中。','2026 年下半年，Hong Xing 逐步结束苏州节点后续发展，相关服务与资源迁入南京主服务节点；青海西宁既有机房继续运行。');replaceText(p,'2026 年，Hong Xing 的基础设施规划经历了苏州扩容、资源收缩以及向南京集中三个阶段。当前公开状态为：苏州地区后续发展逐步结束，开发、技术、服务与数据资源向南京迁移；最终部署地点与完成时间以后续正式公告为准。','2026 年，Hong Xing 的基础设施规划经历苏州扩容、资源收缩与服务迁移三个阶段。当前状态为：苏州相关服务与资源逐步迁入南京主服务节点；青海西宁既有机房继续运行，不属于本次迁移。');replaceText(p,'Hong Xing 逐步停止苏州节点后续发展，相关开发、业务与服务资源迁入南京主服务节点；Amia_晓山瑞希相关服务已接入南京，既有内蒙古机房继续运行。','Hong Xing 逐步停止苏州节点后续发展，相关开发、业务与服务资源迁入南京主服务节点；Amia_晓山瑞希相关服务已接入南京，青海西宁既有机房继续运行。')});if(location.pathname.endsWith('/infrastructure.html')||location.pathname.endsWith('infrastructure.html')){const grid=q('.status-grid');if(grid&&!grid.querySelector('.hx-xining-status')){const card=d.createElement('article');card.className='status reveal hx-xining-status';card.innerHTML='<h3>青海西宁</h3><p>既有机房持续运行，继续承担现有基础设施与服务职责；该节点不属于本次苏州至南京的迁移链路。</p>';grid.appendChild(card)}}if(d.body.dataset.page==='home'){const hero=q('.hero'),hc=hero&&q('.hero-copy',hero),hv=hero&&q('.hero-visual',hero),grid=hero&&q('.hero-grid',hero);hc?.classList.add('in');hv?.classList.add('in');if(hc){hc.style.opacity='1';hc.style.transform='none';hc.style.visibility='visible'}if(hv){hv.style.opacity='1';hv.style.transform='none';hv.style.visibility='visible'}if(matchMedia('(max-width:760px)').matches&&grid&&hc&&hv){hero.style.minHeight='0';grid.style.display='flex';grid.style.flexDirection='column';grid.style.minHeight='0';grid.style.padding='0';grid.style.gap='0';hc.style.order='1';hc.style.minHeight='0';hv.style.order='2';hv.style.minHeight='360px';hv.style.height='360px'}import('./hero-webgl.js?v=20260906-6').then(()=>{const c=q('.hero-copy'),v=q('.hero-visual');c?.classList.add('in');v?.classList.add('in');if(c){c.style.opacity='1';c.style.transform='none';c.style.visibility='visible'}if(v){v.style.opacity='1';v.style.transform='none';v.style.visibility='visible'}}).catch(err=>{console.warn('[HongXing] WebGL hero unavailable; static hero retained.',err);if(hc){hc.style.display='block';hc.style.opacity='1';hc.style.visibility='visible'}if(hv){hv.style.display='grid';hv.style.opacity='1';hv.style.visibility='visible'}})}const header=q('.site-header'),navBtn=q('.menu-btn'),mobile=q('.mobile-nav');const paintHeader=()=>header?.classList.toggle('scrolled',scrollY>8);paintHeader();addEventListener('scroll',paintHeader,{passive:true});navBtn?.addEventListener('click',()=>{const open=mobile.classList.toggle('open');navBtn.setAttribute('aria-expanded',String(open))});const reveals=qa('.reveal');if(reduced||!('IntersectionObserver'in window))reveals.forEach(x=>x.classList.add('in'));else{const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.08,rootMargin:'0px 0px -6%'});reveals.forEach(x=>io.observe(x))}const stage=q('[data-mark-stage]');if(stage){const base='rotateX(-4deg) rotateY(-9deg) rotateZ(-1deg)';stage.style.transform=base;if(!reduced&&matchMedia('(min-width:761px)').matches){stage.parentElement?.addEventListener('pointermove',e=>{const r=stage.parentElement.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;stage.style.transform=`rotateX(${-4-y*9}deg) rotateY(${-9+x*14}deg) rotateZ(${x*1.5}deg)`});stage.parentElement?.addEventListener('pointerleave',()=>stage.style.transform=base)}}qa('.quick-card').forEach(c=>{c.addEventListener('mouseenter',()=>{qa('.quick-card').forEach(x=>x.classList.remove('active'));c.classList.add('active')});c.addEventListener('click',()=>{qa('.quick-card').forEach(x=>x.classList.remove('active'));c.classList.add('active')})});if(d.body.dataset.page==='updates'){const rows=qa('.update-row'),search=q('[data-search]'),filters=qa('[data-filter]'),pages=q('[data-pagination]'),summary=q('[data-summary]'),dialog=q('#update-dialog'),dlgTitle=q('[data-dialog-title]'),dlgDate=q('[data-dialog-date]'),dlgText=q('[data-dialog-text]');let filter='all',term='',page=1;const per=4;const searchable=r=>[r.textContent,r.dataset.title,r.dataset.detail,r.dataset.date,r.dataset.category].filter(Boolean).join(' ').toLowerCase();function render(){const matched=rows.filter(r=>(filter==='all'||r.dataset.category===filter)&&(!term||searchable(r).includes(term)));const pageCount=Math.max(1,Math.ceil(matched.length/per));page=Math.min(page,pageCount);rows.forEach(r=>r.classList.add('hidden'));matched.slice((page-1)*per,page*per).forEach(r=>r.classList.remove('hidden'));if(summary)summary.textContent=`${matched.length} 条记录 · 第 ${page}/${pageCount} 页`;pages?.replaceChildren();for(let i=1;i<=pageCount;i++){const b=d.createElement('button');b.className='page-btn'+(i===page?' active':'');b.textContent=i;b.onclick=()=>{page=i;render();scrollTo({top:q('.updates-tools').getBoundingClientRect().top+scrollY-90,behavior:reduced?'auto':'smooth'})};pages?.appendChild(b)}}search?.addEventListener('input',()=>{term=search.value.trim().toLowerCase();page=1;render()});filters.forEach(b=>b.onclick=()=>{filters.forEach(x=>x.classList.remove('active'));b.classList.add('active');filter=b.dataset.filter;page=1;render()});rows.forEach(r=>q('.detail-btn',r)?.addEventListener('click',()=>{if(dlgDate)dlgDate.textContent=r.dataset.date||'';if(dlgTitle)dlgTitle.textContent=r.dataset.title||'';if(dlgText)dlgText.textContent=r.dataset.detail||q('p',r)?.textContent||'';dialog?.showModal()}));q('.dialog-close')?.addEventListener('click',()=>dialog?.close());render()}}const morphCss=d.createElement('link');morphCss.rel='stylesheet';morphCss.href='assets/css/morphicons-ui.css?v=20260906-6';d.head.appendChild(morphCss);import('./morphicons-ui.js?v=20260906-6').catch(err=>console.warn('[HongXing] Morphicons unavailable; static controls retained.',err));})();
+(()=>{
+  'use strict';
+  const d=document;
+  const q=(s,c=d)=>c?.querySelector?.(s)||null;
+  const qa=(s,c=d)=>c?.querySelectorAll?[...c.querySelectorAll(s)]:[];
+  const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false;
+
+  // Fail-open first: content must remain visible even if any optional enhancement fails.
+  const rescue=d.createElement('style');
+  rescue.textContent=`
+    .reveal{opacity:1!important;transform:none!important;visibility:visible!important}
+    .hero,.hero-grid,.hero-copy,.hero-visual{visibility:visible!important}
+    .hero-copy,.hero-visual{opacity:1!important;transform:none!important}
+    @media(max-width:760px){
+      body[data-page="home"] .hero{min-height:0!important}
+      body[data-page="home"] .hero-grid{display:flex!important;flex-direction:column!important;min-height:0!important;padding:0!important;gap:0!important}
+      body[data-page="home"] .hero-copy{order:1!important;min-height:0!important}
+      body[data-page="home"] .hero-visual{order:2!important;min-height:340px!important;height:340px!important}
+    }
+  `;
+  d.head.appendChild(rescue);
+  qa('.reveal').forEach(el=>el.classList.add('in'));
+
+  const addCss=(href)=>{
+    if(q(`link[href^="${href.split('?')[0]}"]`)) return;
+    const l=d.createElement('link'); l.rel='stylesheet'; l.href=href; d.head.appendChild(l);
+  };
+  addCss('assets/css/approved-visual.css?v=20260906-7');
+  addCss('assets/css/polish-v3.css?v=20260906-7');
+  addCss('assets/css/hero-webgl.css?v=20260906-7');
+  addCss('assets/css/infra-service.css?v=20260906-7');
+
+  // Basic navigation must never depend on optional modules.
+  try{
+    const header=q('.site-header'), navBtn=q('.menu-btn'), mobile=q('.mobile-nav');
+    const paint=()=>header?.classList.toggle('scrolled',window.scrollY>8);
+    paint(); window.addEventListener('scroll',paint,{passive:true});
+    navBtn?.addEventListener('click',()=>{
+      if(!mobile) return;
+      const open=mobile.classList.toggle('open');
+      navBtn.setAttribute('aria-expanded',String(open));
+    });
+  }catch(e){console.warn('[HongXing] nav enhancement skipped',e)}
+
+  // Remove personal repository strip from the Hong Xing homepage.
+  if(d.body.dataset.page==='home') q('.entry-strip')?.remove();
+
+  // Static asset swaps and infrastructure wording.
+  try{
+    qa('img').forEach(img=>{
+      const src=img.getAttribute('src')||'';
+      if(src.endsWith('suzhou-landmark.svg')) img.src='assets/img/suzhou-landmark.webp?v=20260906-7';
+      if(src.endsWith('nanjing-landmark.svg')) img.src='assets/img/nanjing-landmark.webp?v=20260906-7';
+      if(src.endsWith('hongxingos7-dev-preview.svg')) img.src='assets/img/hongxingos7-dev-preview.svg?v=20260906-7';
+    });
+
+    qa('.migration-layout').forEach(box=>{
+      const cards=qa('.city-card',box);
+      const s0=cards[0], s1=cards[1];
+      if(s0){ const a=q('.city-label strong',s0), b=q('.city-label span',s0); if(a)a.textContent='SUZHOU'; if(b)b.textContent='苏州节点 · 相关服务迁移中'; }
+      if(s1){ const a=q('.city-label strong',s1), b=q('.city-label span',s1); if(a)a.textContent='NANJING'; if(b)b.textContent='南京主服务节点 · 承接迁移服务与资源'; }
+      const route=q('.route',box); if(route){ const a=q('strong',route),b=q('small',route); if(a)a.textContent='服务迁移'; if(b)b.textContent='苏州 → 南京'; }
+
+      const parent=box.parentElement;
+      if(parent&&!q('.hx-continuous-service',parent)){
+        const svc=d.createElement('section');
+        svc.className='hx-continuous-service in';
+        svc.innerHTML=`<div class="hx-continuous-head"><div><small>CONTINUOUS SERVICE</small><h3>青海西宁既有机房</h3></div><p>青海西宁既有机房持续运行，不属于本次苏州至南京的迁移链路。</p></div><article class="hx-xining-card"><div class="hx-xining-copy"><span class="eyebrow">QINGHAI · XINING</span><h4>持续服务</h4><p>现有基础设施保持运行，继续承担既有服务职责，并与南京主服务节点共同支撑当前服务体系。</p></div><div class="hx-xining-model"><img src="assets/img/xining-datacenter.svg?v=20260906-7" alt="青海西宁既有机房基础设施模型"></div></article>`;
+        parent.insertBefore(svc,q('.infra-note',parent));
+      }
+    });
+    qa('.infra-note').forEach(n=>n.textContent='苏州相关服务正在迁入南京主服务节点；青海西宁既有机房持续运行，不属于本次迁移。图中苏州与南京建筑仅用于区分城市，不对应实际机房建筑或地址。');
+  }catch(e){console.warn('[HongXing] infrastructure enhancement skipped',e)}
+
+  // Keep standard reveal animation only for content below the fold; fail-open already made everything visible.
+  if(!reduced&&'IntersectionObserver' in window){
+    try{
+      const io=new IntersectionObserver(entries=>entries.forEach(entry=>{
+        if(entry.isIntersecting){entry.target.classList.add('in');io.unobserve(entry.target)}
+      }),{threshold:.06,rootMargin:'0px 0px -4%'});
+      qa('.reveal').forEach(el=>io.observe(el));
+    }catch(e){}
+  }
+
+  // Home hero: optional WebGL enhancement. Static hero remains visible on any failure.
+  if(d.body.dataset.page==='home'){
+    const hero=q('.hero'), copy=q('.hero-copy',hero), visual=q('.hero-visual',hero);
+    copy?.classList.add('in'); visual?.classList.add('in');
+    if(copy){copy.style.opacity='1';copy.style.visibility='visible';copy.style.transform='none'}
+    if(visual){visual.style.opacity='1';visual.style.visibility='visible';visual.style.transform='none'}
+    Promise.resolve()
+      .then(()=>import('./hero-webgl.js?v=20260906-7'))
+      .catch(err=>{
+        console.warn('[HongXing] WebGL hero unavailable; static hero retained.',err);
+        hero?.classList.remove('hx-shader-hero');
+        if(copy){copy.style.display='block';copy.style.opacity='1';copy.style.visibility='visible'}
+        if(visual){visual.style.display='grid';visual.style.opacity='1';visual.style.visibility='visible'}
+      });
+  }
+
+  // Quick Services interaction.
+  try{
+    qa('.quick-card').forEach(c=>{
+      const activate=()=>{qa('.quick-card').forEach(x=>x.classList.remove('active'));c.classList.add('active')};
+      c.addEventListener('mouseenter',activate); c.addEventListener('click',activate);
+    });
+  }catch(e){}
+
+  // Updates page filtering, pagination and details.
+  if(d.body.dataset.page==='updates'){
+    try{
+      const rows=qa('.update-row'), search=q('[data-search]'), filters=qa('[data-filter]'), pages=q('[data-pagination]'), summary=q('[data-summary]');
+      const dialog=q('#update-dialog'), dlgTitle=q('[data-dialog-title]'), dlgDate=q('[data-dialog-date]'), dlgText=q('[data-dialog-text]');
+      let filter='all', term='', page=1; const per=4;
+      const searchable=r=>[r.textContent,r.dataset.title,r.dataset.detail,r.dataset.date,r.dataset.category].filter(Boolean).join(' ').toLowerCase();
+      const render=()=>{
+        const matched=rows.filter(r=>(filter==='all'||r.dataset.category===filter)&&(!term||searchable(r).includes(term)));
+        const pageCount=Math.max(1,Math.ceil(matched.length/per)); page=Math.min(page,pageCount);
+        rows.forEach(r=>r.classList.add('hidden'));
+        matched.slice((page-1)*per,page*per).forEach(r=>r.classList.remove('hidden'));
+        if(summary) summary.textContent=`${matched.length} 条记录 · 第 ${page}/${pageCount} 页`;
+        pages?.replaceChildren();
+        for(let i=1;i<=pageCount;i++){
+          const b=d.createElement('button'); b.className='page-btn'+(i===page?' active':''); b.textContent=String(i);
+          b.onclick=()=>{page=i;render()}; pages?.appendChild(b);
+        }
+      };
+      search?.addEventListener('input',()=>{term=search.value.trim().toLowerCase();page=1;render()});
+      filters.forEach(b=>b.onclick=()=>{filters.forEach(x=>x.classList.remove('active'));b.classList.add('active');filter=b.dataset.filter||'all';page=1;render()});
+      rows.forEach(r=>q('.detail-btn',r)?.addEventListener('click',()=>{
+        if(dlgDate)dlgDate.textContent=r.dataset.date||''; if(dlgTitle)dlgTitle.textContent=r.dataset.title||''; if(dlgText)dlgText.textContent=r.dataset.detail||q('p',r)?.textContent||''; dialog?.showModal?.();
+      }));
+      q('.dialog-close')?.addEventListener('click',()=>dialog?.close?.()); render();
+    }catch(e){console.warn('[HongXing] updates enhancement skipped',e)}
+  }
+
+  // Optional icon morphing, never allowed to affect page visibility.
+  try{
+    addCss('assets/css/morphicons-ui.css?v=20260906-7');
+    import('./morphicons-ui.js?v=20260906-7').catch(()=>{});
+  }catch(e){}
+})();
