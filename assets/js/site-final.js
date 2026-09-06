@@ -24,10 +24,10 @@
     if(q(`link[href^="${href.split('?')[0]}"]`)) return;
     const l=d.createElement('link');l.rel='stylesheet';l.href=href;d.head.appendChild(l);
   };
-  addCss('assets/css/approved-visual.css?v=20260906-8');
-  addCss('assets/css/polish-v3.css?v=20260906-8');
-  addCss('assets/css/hero-webgl.css?v=20260906-8');
-  addCss('assets/css/infra-service.css?v=20260906-8');
+  addCss('assets/css/approved-visual.css?v=20260906-9');
+  addCss('assets/css/polish-v3.css?v=20260906-9');
+  addCss('assets/css/hero-webgl.css?v=20260906-9');
+  addCss('assets/css/infra-service.css?v=20260906-9');
 
   try{
     const header=q('.site-header'),navBtn=q('.menu-btn'),mobile=q('.mobile-nav');
@@ -45,9 +45,9 @@
   try{
     qa('img').forEach(img=>{
       const src=img.getAttribute('src')||'';
-      if(src.endsWith('suzhou-landmark.svg'))img.src='assets/img/suzhou-landmark.webp?v=20260906-8';
-      if(src.endsWith('nanjing-landmark.svg'))img.src='assets/img/nanjing-landmark.webp?v=20260906-8';
-      if(src.endsWith('hongxingos7-dev-preview.svg'))img.src='assets/img/hongxingos7-dev-preview.svg?v=20260906-8';
+      if(src.endsWith('suzhou-landmark.svg'))img.src='assets/img/suzhou-landmark.webp?v=20260906-9';
+      if(src.endsWith('nanjing-landmark.svg'))img.src='assets/img/nanjing-landmark.webp?v=20260906-9';
+      if(src.endsWith('hongxingos7-dev-preview.svg'))img.src='assets/img/hongxingos7-dev-preview.svg?v=20260906-9';
     });
 
     const replace=(el,from,to)=>{if(el&&el.textContent.includes(from))el.textContent=el.textContent.replace(from,to)};
@@ -69,7 +69,7 @@
       if(parent&&!q('.hx-continuous-service',parent)){
         const svc=d.createElement('section');
         svc.className='hx-continuous-service in';
-        svc.innerHTML=`<div class="hx-continuous-head"><div><small>CONTINUOUS SERVICE</small><h3>青海西宁既有机房</h3></div><p>该机房保持运行，继续承担现有服务职责，不属于苏州节点至南京主服务节点的迁移范围。</p></div><article class="hx-xining-card"><div class="hx-xining-copy"><span class="eyebrow">QINGHAI · XINING</span><h4>持续运行</h4><p>现有基础设施继续运行，并与南京主服务节点共同承担当前服务。</p></div><div class="hx-xining-model"><img src="assets/img/xining-datacenter.svg?v=20260906-8" alt="青海西宁既有机房基础设施模型"></div></article>`;
+        svc.innerHTML=`<div class="hx-continuous-head"><div><small>CONTINUOUS SERVICE</small><h3>青海西宁既有机房</h3></div><p>该机房保持运行，继续承担现有服务职责，不属于苏州节点至南京主服务节点的迁移范围。</p></div><article class="hx-xining-card"><div class="hx-xining-copy"><span class="eyebrow">QINGHAI · XINING</span><h4>持续运行</h4><p>现有基础设施继续运行，并与南京主服务节点共同承担当前服务。</p></div><div class="hx-xining-model"><img src="assets/img/xining-datacenter.svg?v=20260906-9" alt="青海西宁既有机房基础设施模型"></div></article>`;
         parent.insertBefore(svc,q('.infra-note',parent));
       }
     });
@@ -105,7 +105,7 @@
     copy?.classList.add('in');visual?.classList.add('in');
     if(copy){copy.style.opacity='1';copy.style.visibility='visible';copy.style.transform='none'}
     if(visual){visual.style.opacity='1';visual.style.visibility='visible';visual.style.transform='none'}
-    Promise.resolve().then(()=>import('./hero-webgl.js?v=20260906-8')).catch(err=>{
+    Promise.resolve().then(()=>import('./hero-webgl.js?v=20260906-9')).catch(err=>{
       console.warn('[HongXing] WebGL hero unavailable; static hero retained.',err);
       hero?.classList.remove('hx-shader-hero');
       if(copy){copy.style.display='block';copy.style.opacity='1';copy.style.visibility='visible'}
@@ -148,7 +148,7 @@
   }
 
   try{
-    addCss('assets/css/morphicons-ui.css?v=20260906-8');
-    import('./morphicons-ui.js?v=20260906-8').catch(()=>{});
+    addCss('assets/css/morphicons-ui.css?v=20260906-9');
+    import('./morphicons-ui.js?v=20260906-9').catch(()=>{});
   }catch(e){}
 })();
