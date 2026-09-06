@@ -2,9 +2,10 @@
   'use strict';
   if(document.body.dataset.page!=='home') return;
   const hero=document.querySelector('.hero');
+  const grid=hero?.querySelector('.hero-grid');
   const copy=hero?.querySelector('.hero-copy');
   const visual=hero?.querySelector('.hero-visual');
-  if(!hero||!copy||!visual) return;
+  if(!hero||!grid||!copy||!visual) return;
 
   const original={copy:copy.innerHTML,visual:visual.innerHTML,heroClass:hero.className};
   const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false;
@@ -13,6 +14,7 @@
 
   const restore=(err)=>{
     if(err) console.warn('[HongXing] particle hero restored to static mode',err);
+    if(visual.parentElement!==grid) grid.appendChild(visual);
     hero.className=original.heroClass;
     copy.innerHTML=original.copy;
     visual.innerHTML=original.visual;
@@ -46,6 +48,17 @@
     Object.assign(copy.style,{opacity:'1',visibility:'visible',transform:'none'});
     Object.assign(visual.style,{opacity:'1',visibility:'visible',transform:'none'});
 
+    const mobileLayout=window.matchMedia('(max-width:760px)');
+    const placeVisual=()=>{
+      const note=copy.querySelector('.hx-hero-note');
+      if(mobileLayout.matches&&note){
+        if(visual.parentElement!==copy||visual.nextElementSibling!==note) copy.insertBefore(visual,note);
+      }else if(visual.parentElement!==grid||visual!==grid.lastElementChild){
+        grid.appendChild(visual);
+      }
+    };
+    placeVisual();
+
     const canvas=visual.querySelector('.hx-particle-canvas');
     const gl=canvas.getContext('webgl2',{alpha:true,antialias:false,premultipliedAlpha:true,powerPreference:'high-performance'});
     if(!gl) throw new Error('WebGL2 context unavailable');
@@ -73,8 +86,7 @@
         uv.y=1.0-uv.y;
         float aspect=u_res.x/u_res.y;
 
-        // The lattice itself moves. Adding time to lattice-space makes every
-        // square travel from the right side of the stage toward the left.
+        // The lattice itself moves from right to left.
         float columns=mix(46.0,58.0,step(760.0,u_res.x));
         vec2 grid=vec2(columns,max(34.0,columns/aspect));
         float flowCells=u_reduce>.5?0.0:u_time*5.2;
@@ -84,15 +96,10 @@
         vec2 cellUv=(gid+0.5-vec2(flowCells,0.0))/grid;
         float rnd=hash21(gid);
 
-        // One inexpensive texture sample. The mask is generated with the same
-        // aspect ratio as the visible stage, so the Hong Xing mark is never
-        // stretched when the hero changes size.
         float logo=texture(u_logo,clamp(cellUv,0.0,1.0)).r;
         float logoShape=smoothstep(.09,.36,logo);
 
-        // 10.5 s cycle: particles enter from the right, a reveal front sweeps
-        // right-to-left across the mark, the completed mark holds, then fades
-        // before the next pass. No logo/network morphing is involved.
+        // Reveal the logo with a right-to-left front, then hold and fade.
         float cycle=u_reduce>.5?6.2:mod(u_time,10.5);
         float revealProgress=smoothstep(.65,5.35,cycle);
         float front=mix(1.16,-.16,revealProgress);
@@ -100,14 +107,10 @@
         float logoLife=1.0-smoothstep(8.35,9.95,cycle);
         float logoDensity=logoShape*revealed*logoLife;
 
-        // A denser band rides with the reveal front, making the direction
-        // readable without adding expensive noise functions or extra textures.
         float frontBand=(1.0-smoothstep(.035,.17,abs(cellUv.x-front)));
         frontBand*=smoothstep(.45,.85,cycle)*(1.0-smoothstep(5.25,5.8,cycle));
         float frontParticles=frontBand*step(.70,hash21(gid+vec2(19.0,7.0)))*.62;
 
-        // Sparse stream particles continue moving across the whole stage even
-        // before the logo begins to reveal.
         float ambient=step(.945,rnd)*.16;
         float size=mix(.245,.335,rnd);
         float square=1.0-smoothstep(size,size+.026,max(abs(local.x),abs(local.y)));
@@ -208,8 +211,6 @@
       const r=canvas.getBoundingClientRect();
       if(!r.width||!r.height)return;
       const mobile=r.width<760;
-      // Lower internal resolution than the previous 1.35/1.75 caps. This is
-      // the main GPU win on high-DPR phones while preserving crisp square cells.
       const dpr=Math.min(window.devicePixelRatio||1,mobile?1.0:1.30);
       const nw=Math.max(1,Math.round(r.width*dpr));
       const nh=Math.max(1,Math.round(r.height*dpr));
@@ -239,6 +240,17 @@
       if(dead||raf||!visible||!onscreen)return;
       raf=requestAnimationFrame(frame);
     };
+
+    const syncLayout=()=>{
+      placeVisual();
+      requestAnimationFrame(()=>{
+        resize();
+        paintLogoMask();
+        startFrames();
+      });
+    };
+    if(mobileLayout.addEventListener) mobileLayout.addEventListener('change',syncLayout);
+    else mobileLayout.addListener?.(syncLayout);
 
     if('ResizeObserver' in window)new ResizeObserver(()=>{resize();startFrames()}).observe(canvas);
     else window.addEventListener('resize',()=>{resize();startFrames()},{passive:true});
