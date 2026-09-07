@@ -10,7 +10,7 @@ if(!hero||!grid||!copy||!visual)return;
 document.querySelectorAll('link[href*="assets/css/hero-webgl.css"]').forEach(link=>link.remove());
 const heroCss=document.createElement('link');
 heroCss.rel='stylesheet';
-heroCss.href='assets/css/hero-webgl.css?v=20260907-5';
+heroCss.href='assets/css/hero-webgl.css?v=20260907-6';
 document.head.appendChild(heroCss);
 
 const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false;
@@ -78,7 +78,7 @@ const logoMask=document.createElement('canvas');
 const maskCtx=logoMask.getContext('2d',{willReadFrequently:true});
 const logoImg=new Image();
 const palette=['#ff9a5d','#ff7138','#ff4e23','#FE2601','#df2109','#bd1905','#272725'];
-let w=0,h=0,dpr=1,raf=0,onScreen=true,logoReady=false,maskData=null,logoBox={x:0,y:0,w:0,h:0};
+let w=0,h=0,dpr=1,raf=0,onScreen=true,logoReady=false,maskData=null,logoPoints=[],logoBox={x:0,y:0,w:0,h:0};
 const started=performance.now();
 
 const buildLogoMask=()=>{
@@ -89,8 +89,8 @@ const buildLogoMask=()=>{
   maskCtx.clearRect(0,0,logoMask.width,logoMask.height);
   const iw=logoImg.naturalWidth||1;
   const ih=logoImg.naturalHeight||1;
-  const maxW=w*(mobile ? .78 : .39);
-  const maxH=h*(mobile ? .31 : .58);
+  const maxW=w*(mobile ? .80 : .41);
+  const maxH=h*(mobile ? .33 : .60);
   const scale=Math.min(maxW/iw,maxH/ih);
   const dw=iw*scale;
   const dh=ih*scale;
@@ -101,6 +101,23 @@ const buildLogoMask=()=>{
   logoBox={x:dx,y:dy,w:dw,h:dh};
   maskCtx.drawImage(logoImg,dx,dy,dw,dh);
   maskData=maskCtx.getImageData(0,0,logoMask.width,logoMask.height).data;
+
+  const step=mobile ? 5.0 : 5.6;
+  const raw=[];
+  for(let y=Math.max(0,dy);y<Math.min(h,dy+dh);y+=step){
+    for(let x=Math.max(0,dx);x<Math.min(w,dx+dw);x+=step){
+      const alpha=maskData[(Math.floor(y)*logoMask.width+Math.floor(x))*4+3];
+      if(alpha>48)raw.push({x,y,lx:(x-dx)/Math.max(1,dw)});
+    }
+  }
+  const maxPoints=mobile ? 1050 : 1500;
+  const stride=Math.max(1,Math.ceil(raw.length/maxPoints));
+  logoPoints=raw.filter((_,i)=>i%stride===0).slice(0,maxPoints).map((p,i)=>({
+    ...p,
+    seed:hash(i*3.17,5),
+    size:1.9+hash(i*5.63,9)*2.15,
+    tone:Math.floor(hash(i*7.81,13)*palette.length)
+  }));
 };
 
 const maskAt=(x,y)=>{
@@ -177,7 +194,7 @@ const drawFiber=(row,rows,t,reveal)=>{
 
     if(logoWeight>.03){
       size=2.7+hash(worldIndex+5,row+11)*2.25;
-      alpha=(.58+hash(worldIndex+13,row+23)*.34)*logoWeight;
+      alpha=(.64+hash(worldIndex+13,row+23)*.30)*logoWeight;
       if(seed<.12)color='#ffb083';
       else if(seed>.91)color='#252523';
     }else if(edge>.02&&x>logoBox.x-70&&x<logoBox.x+logoBox.w+70){
@@ -193,6 +210,23 @@ const drawFiber=(row,rows,t,reveal)=>{
   }
 };
 
+const drawLogoSkeleton=(reveal)=>{
+  const frontLocal=1.06-reveal*1.16;
+  for(let i=0;i<logoPoints.length;i++){
+    const p=logoPoints[i];
+    const shown=smooth((p.lx-frontLocal)/.115);
+    if(shown<=.002)continue;
+    const base=.34+p.seed*.28;
+    const alpha=base*shown;
+    const color=palette[p.tone];
+    const size=p.size;
+    drawParticle(p.x+3.8,p.y,size*.58,color,alpha*.07);
+    drawParticle(p.x+1.9,p.y,size*.78,color,alpha*.14);
+    drawParticle(p.x,p.y,size,color,alpha);
+    if(i%10===0)drawParticle(p.x-1.0,p.y-1.0,size*.42,'#ffb88c',alpha*.25);
+  }
+};
+
 const draw=(now=0)=>{
   raf=0;
   if(!onScreen||!visible())return;
@@ -202,14 +236,25 @@ const draw=(now=0)=>{
   const elapsed=reduced ? 4.4 : (now-started)/1000;
   const reveal=smooth((elapsed-.25)/3.3);
   const rows=w<760 ? 42 : 56;
+
+  // Stable particle skeleton makes the brand mark readable at all times after reveal.
+  drawLogoSkeleton(reveal);
+
+  // Cloudflare-like fiber field continues to travel right -> left over the stable mark.
   for(let row=0;row<rows;row++)drawFiber(row,rows,t,reveal);
+
+  // A second lighter skeleton pass keeps the mark legible through the moving fibers.
+  ctx.globalCompositeOperation='source-over';
+  ctx.globalAlpha=1;
+  if(reveal>.72)drawLogoSkeleton(reveal*.92);
+
   ctx.globalAlpha=1;
   if(!reduced)raf=requestAnimationFrame(draw);
 };
 
 const start=()=>{if(!raf&&onScreen&&visible())raf=requestAnimationFrame(draw);};
 logoImg.onload=()=>{logoReady=true;buildLogoMask();start();};
-logoImg.src='assets/img/hongxing-mark-exact.svg?v=20260907-5';
+logoImg.src='assets/img/hongxing-mark-exact.svg?v=20260907-6';
 if('ResizeObserver'in window)new ResizeObserver(()=>{resize();start();}).observe(visual);
 else window.addEventListener('resize',()=>{resize();start();},{passive:true});
 if('IntersectionObserver'in window)new IntersectionObserver(entries=>{
