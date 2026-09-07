@@ -10,7 +10,7 @@ if(!hero||!grid||!copy||!visual)return;
 document.querySelectorAll('link[href*="assets/css/hero-webgl.css"]').forEach(link=>link.remove());
 const heroCss=document.createElement('link');
 heroCss.rel='stylesheet';
-heroCss.href='assets/css/hero-webgl.css?v=20260907-3';
+heroCss.href='assets/css/hero-webgl.css?v=20260907-4';
 document.head.appendChild(heroCss);
 
 const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false;
@@ -40,14 +40,19 @@ Object.assign(copy.style,{opacity:'1',visibility:'visible',transform:'none'});
 Object.assign(visual.style,{opacity:'1',visibility:'visible',transform:'none'});
 if(visual.parentElement!==grid)grid.appendChild(visual);
 
+const palette=['#ff9a60','#ff6b34','#ff4b20','#FE2601','#dc2108','#b51a06','#252523'];
+
+// ---------------------------------------------------------------------------
+// HERO: one-way ambient flow + one-time logo reveal. No visible loopback.
+// ---------------------------------------------------------------------------
 const canvas=visual.querySelector('.hx-particle-canvas');
 const ctx=canvas?.getContext('2d',{alpha:true,desynchronized:true});
 if(canvas&&ctx){
   const mask=document.createElement('canvas');
   const mctx=mask.getContext('2d',{willReadFrequently:true});
   const logo=new Image();
-  const palette=['#ff8f55','#ff6430','#ff451c','#FE2601','#d91f07','#b31905','#242422'];
-  let w=0,h=0,dpr=1,raf=0,onScreen=true,logoReady=false,logoPoints=[],ambient=[];
+  let w=0,h=0,dpr=1,raf=0,onScreen=true,logoReady=false,logoPoints=[],ambient=[],maskData=null,logoBox={x:0,y:0,w:0,h:0};
+  const started=performance.now();
 
   const buildLogo=()=>{
     if(!logoReady||!w||!h)return;
@@ -56,28 +61,29 @@ if(canvas&&ctx){
     mask.height=Math.max(1,Math.round(h));
     mctx.clearRect(0,0,mask.width,mask.height);
     const iw=logo.naturalWidth||1,ih=logo.naturalHeight||1;
-    const maxW=w*(mobile ? .78 : .40);
-    const maxH=h*(mobile ? .31 : .60);
+    const maxW=w*(mobile ? .80 : .41);
+    const maxH=h*(mobile ? .32 : .61);
     const scale=Math.min(maxW/iw,maxH/ih);
     const dw=iw*scale,dh=ih*scale;
-    const cx=w*(mobile ? .68 : .78),cy=h*(mobile ? .43 : .48);
+    const cx=w*(mobile ? .69 : .79),cy=h*(mobile ? .43 : .48);
     const dx=cx-dw*.5,dy=cy-dh*.5;
+    logoBox={x:dx,y:dy,w:dw,h:dh};
     mctx.drawImage(logo,dx,dy,dw,dh);
-    const data=mctx.getImageData(0,0,mask.width,mask.height).data;
-    const step=mobile ? 5.5 : 6.2;
+    maskData=mctx.getImageData(0,0,mask.width,mask.height).data;
+    const step=mobile ? 5.2 : 5.8;
     const raw=[];
     for(let y=Math.max(0,dy);y<Math.min(h,dy+dh);y+=step){
       for(let x=Math.max(0,dx);x<Math.min(w,dx+dw);x+=step){
-        const a=data[(Math.floor(y)*mask.width+Math.floor(x))*4+3];
-        if(a>48)raw.push({x,y,lx:(x-dx)/Math.max(1,dw)});
+        const a=maskData[(Math.floor(y)*mask.width+Math.floor(x))*4+3];
+        if(a>52)raw.push({x,y,lx:(x-dx)/Math.max(1,dw)});
       }
     }
-    const maxPoints=mobile ? 900 : 1250;
+    const maxPoints=mobile ? 980 : 1380;
     const stride=Math.max(1,Math.ceil(raw.length/maxPoints));
     logoPoints=raw.filter((_,i)=>i%stride===0).slice(0,maxPoints).map((p,i)=>({
       ...p,
       seed:hash(i*3.17,2),
-      size:2.0+hash(i*5.73,7)*2.6,
+      size:2.0+hash(i*5.73,7)*2.5,
       tone:Math.floor(hash(i*8.1,11)*palette.length)
     }));
   };
@@ -85,15 +91,22 @@ if(canvas&&ctx){
   const buildAmbient=()=>{
     if(!w||!h)return;
     const mobile=w<760;
-    const count=mobile ? 230 : 360;
+    const count=mobile ? 300 : 470;
     ambient=Array.from({length:count},(_,i)=>({
       x:hash(i*2.9,3)*w,
       y:hash(i*6.7,9)*h,
-      speed:32+hash(i*4.2,15)*48,
-      size:1.0+hash(i*7.5,4)*2.2,
-      alpha:.045+hash(i*9.1,6)*.14,
-      color:palette[Math.floor(hash(i*11.2,13)*6)]
+      speed:34+hash(i*4.2,15)*52,
+      size:1.0+hash(i*7.5,4)*2.3,
+      alpha:.05+hash(i*9.1,6)*.16,
+      tone:Math.floor(hash(i*11.2,13)*6),
+      wrap:0,
+      seed:hash(i*13.3,17)
     }));
+  };
+
+  const maskAt=(x,y)=>{
+    if(!maskData||x<0||y<0||x>=mask.width||y>=mask.height)return 0;
+    return maskData[(Math.floor(y)*mask.width+Math.floor(x))*4+3]/255;
   };
 
   const resize=()=>{
@@ -118,44 +131,57 @@ if(canvas&&ctx){
     raf=0;if(!onScreen||!visible())return;
     const dt=Math.min(.032,Math.max(.001,(now-last||16)/1000));last=now;
     ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
-    const t=reduced ? 4.8 : now/1000;
+    const t=reduced ? 4.6 : now/1000;
+    const elapsed=reduced ? 4.6 : (now-started)/1000;
+    const reveal=smooth((elapsed-.35)/3.7);
+    const front=logoBox.x+logoBox.w*(1-reveal);
 
     ambient.forEach((p,i)=>{
       p.x-=p.speed*dt;
-      if(p.x<-12){p.x=w+12+hash(i+Math.floor(t),17)*w*.10;p.y=hash(i*13.7+Math.floor(t),5)*h;}
-      const leftFade=clamp((p.x/w-.02)/.26,0,1);
-      sq(p.x+7,p.y,p.size*.55,p.color,p.alpha*.10*leftFade);
-      sq(p.x+3.5,p.y,p.size*.76,p.color,p.alpha*.20*leftFade);
-      sq(p.x,p.y,p.size,p.color,p.alpha*leftFade);
+      if(p.x<-16){
+        p.wrap+=1;
+        p.x=w+16+hash(i*5.1,p.wrap)*w*.10;
+        p.y=hash(i*9.7,p.wrap+3)*h;
+      }
+      const inside=maskAt(p.x,p.y);
+      const revealed=p.x>=front ? 1 : 0;
+      const logoBoost=inside*revealed;
+      let color=palette[p.tone];
+      let size=p.size;
+      let alpha=p.alpha;
+      if(logoBoost>.05){
+        alpha=.34+p.seed*.48;
+        size*=1.30+p.seed*.26;
+        if(p.seed<.14)color='#ffab78';
+        else if(p.seed>.90)color='#242422';
+      }
+      const leftFade=clamp((p.x/w-.015)/.24,0,1);
+      alpha*=leftFade;
+      sq(p.x+9,p.y,size*.50,color,alpha*.08);
+      sq(p.x+4.5,p.y,size*.72,color,alpha*.18);
+      sq(p.x,p.y,size,color,alpha);
     });
 
-    const cycle=reduced ? 5.2 : (t%11.2);
-    let reveal=1,fade=1;
-    if(cycle<.55)reveal=0;
-    else if(cycle<4.5)reveal=smooth((cycle-.55)/3.95);
-    if(cycle>9.4)fade=1-smooth((cycle-9.4)/1.5);
-    const front=1.08-reveal*1.18;
-    const microDrift=reduced ? 0 : Math.sin(t*.72)*.65;
-
     logoPoints.forEach((p,i)=>{
-      const localReveal=smooth((p.lx-front)/.12);
+      const localReveal=smooth((p.lx-(1.06-reveal*1.16))/.115);
       if(localReveal<=.002)return;
-      const a=(.56+p.seed*.36)*localReveal*fade;
+      const a=(.50+p.seed*.34)*localReveal;
       const c=palette[p.tone];
-      const x=p.x+microDrift;
-      const y=p.y+Math.sin(t*.48+i*.11)*.22;
-      sq(x+5,y,p.size*.62,c,a*.10);
-      sq(x+2.5,y,p.size*.80,c,a*.18);
+      const x=p.x;
+      const y=p.y;
+      sq(x+4.5,y,p.size*.58,c,a*.08);
+      sq(x+2.2,y,p.size*.78,c,a*.16);
       sq(x,y,p.size,c,a);
-      if(i%8===0)sq(x-1.2,y-1.2,p.size*.42,'#ffad79',a*.28);
+      if(i%9===0)sq(x-1.1,y-1.1,p.size*.40,'#ffb88c',a*.26);
     });
 
     ctx.globalAlpha=1;
     if(!reduced)raf=requestAnimationFrame(draw);
   };
+
   const start=()=>{if(!raf&&onScreen&&visible())raf=requestAnimationFrame(draw);};
   logo.onload=()=>{logoReady=true;buildLogo();start();};
-  logo.src='assets/img/hongxing-mark-exact.svg?v=20260907-3';
+  logo.src='assets/img/hongxing-mark-exact.svg?v=20260907-4';
   if('ResizeObserver'in window)new ResizeObserver(()=>{resize();start();}).observe(visual);
   else window.addEventListener('resize',()=>{resize();start();},{passive:true});
   if('IntersectionObserver'in window)new IntersectionObserver(es=>{onScreen=es.some(e=>e.isIntersecting);if(onScreen)start();else if(raf){cancelAnimationFrame(raf);raf=0;}},{threshold:0}).observe(hero);
@@ -163,19 +189,22 @@ if(canvas&&ctx){
   resize();start();
 }
 
+// ---------------------------------------------------------------------------
+// THREE REGIONS: structured packet lanes. No clouds, no pulse, no route line.
+// ---------------------------------------------------------------------------
 const region=copy.querySelector('.hx-region-field');
 const rc=region?.querySelector('.hx-region-canvas');
 const rctx=rc?.getContext('2d',{alpha:false,desynchronized:true});
 if(region&&rc&&rctx){
   let rw=0,rh=0,rdpr=1,rraf=0,onScreen=true;
-  const N={s:[.12,.73],n:[.58,.25],x:[.78,.72]};
+  const N={s:[.12,.72],n:[.58,.24],x:[.78,.72]};
   const point=([x,y])=>({x:x*rw,y:y*rh});
   const bez=(a,c,b,t)=>{const u=1-t;return{x:u*u*a.x+2*u*t*c.x+t*t*b.x,y:u*u*a.y+2*u*t*c.y+t*t*b.y};};
-  const bandPoint=(from,to,bend,t,lane)=>{
+  const lanePoint=(from,to,bend,t,offset)=>{
     const a=point(from),b=point(to),c={x:(a.x+b.x)*.5,y:(a.y+b.y)*.5+rh*bend};
-    const p=bez(a,c,b,t),p2=bez(a,c,b,Math.min(1,t+.01));
+    const p=bez(a,c,b,t),p2=bez(a,c,b,Math.min(1,t+.006));
     const dx=p2.x-p.x,dy=p2.y-p.y,len=Math.max(1,Math.hypot(dx,dy));
-    return{x:p.x-dy/len*lane,y:p.y+dx/len*lane};
+    return{x:p.x-dy/len*offset,y:p.y+dx/len*offset};
   };
   const sq=(x,y,s,c,a)=>{rctx.globalAlpha=a;rctx.fillStyle=c;rctx.fillRect(x-s*.5,y-s*.5,s,s);rctx.globalAlpha=1;};
 
@@ -187,54 +216,62 @@ if(region&&rc&&rctx){
     rw=r.width;rh=r.height;rdpr=ndpr;rc.width=nw;rc.height=nh;rctx.setTransform(rdpr,0,0,rdpr,0,0);
   };
 
-  const nodeCloud=(center,count,radius,colorA,colorB,seedBase)=>{
-    const c=point(center);
-    for(let i=0;i<count;i++){
-      const angle=hash(seedBase+i*2.7,4)*Math.PI*2;
-      const rr=Math.sqrt(hash(seedBase+i*4.1,8))*radius;
-      const x=c.x+Math.cos(angle)*rr;
-      const y=c.y+Math.sin(angle)*rr*.64;
-      const s=1.2+hash(seedBase+i*5.3,3)*2.3;
-      const col=hash(seedBase+i*7.9,12)>.28 ? colorA : colorB;
-      const alpha=.08+hash(seedBase+i*8.8,6)*.22;
-      sq(x,y,s,col,alpha);
+  const drawNode=(center,kind)=>{
+    const p=point(center);
+    const main=kind==='n'?'#FE2601':kind==='x'?'#2d2d2b':'#8b8b86';
+    const ring=kind==='n'?'rgba(254,38,1,.18)':'rgba(70,70,67,.10)';
+    rctx.strokeStyle=ring;rctx.lineWidth=1;
+    rctx.strokeRect(p.x-13,p.y-13,26,26);
+    rctx.strokeRect(p.x-7,p.y-7,14,14);
+    sq(p.x,p.y,6,main,.95);
+    for(let i=0;i<8;i++){
+      const ox=((i%4)-1.5)*6,oy=(i<4?-1:1)*17;
+      sq(p.x+ox,p.y+oy,1.7,main,kind==='n'?.18:.10);
     }
   };
 
   const drawRegion=(now=0)=>{
     rraf=0;if(!onScreen||!visible())return;
-    rctx.setTransform(rdpr,0,0,rdpr,0,0);rctx.globalAlpha=1;rctx.fillStyle='#fff';rctx.fillRect(0,0,rw,rh);
-    const t=reduced ? 2.8 : now/1000;
+    rctx.setTransform(rdpr,0,0,rdpr,0,0);
+    rctx.globalAlpha=1;rctx.fillStyle='#fff';rctx.fillRect(0,0,rw,rh);
+    const t=reduced ? 2.5 : now/1000;
 
-    nodeCloud(N.n,58,28,'#FE2601','#ff7a38',10);
-    nodeCloud(N.s,28,19,'#9a9a94','#d9d9d4',120);
-    nodeCloud(N.x,31,20,'#333330','#a7a7a1',240);
+    // very faint technical grid for structure, not decoration
+    rctx.strokeStyle='rgba(35,35,33,.035)';rctx.lineWidth=1;
+    for(let x=18;x<rw;x+=28){rctx.beginPath();rctx.moveTo(x,0);rctx.lineTo(x,rh);rctx.stroke();}
+    for(let y=18;y<rh;y+=28){rctx.beginPath();rctx.moveTo(0,y);rctx.lineTo(rw,y);rctx.stroke();}
 
-    for(let lane=-3;lane<=3;lane++){
-      for(let i=0;i<8;i++){
-        const q=(t*(.070+Math.abs(lane)*.002)+i/8+lane*.071)%1;
-        const p=bandPoint(N.s,N.n,-.15,q,lane*4.2);
-        const bright=(i+lane+12)%4===0;
-        const c=bright ? '#ff6b31' : '#FE2601';
-        sq(p.x+4.5,p.y,1.6,c,.055);
-        sq(p.x,p.y,bright ? 3.5 : 2.5,c,bright ? .68 : .46);
-      }
-    }
-
+    // Suzhou -> Nanjing: five parallel packet lanes
     for(let lane=-2;lane<=2;lane++){
-      for(let i=0;i<7;i++){
-        const q=(t*(.050+Math.abs(lane)*.002)+i/7+lane*.09)%1;
-        const p=bandPoint(N.x,N.n,.045,q,lane*4.2);
-        const dark=(i+lane+9)%3===0;
-        const c=dark ? '#343432' : '#8e8e88';
-        sq(p.x+3.5,p.y,1.5,c,.045);
-        sq(p.x,p.y,dark ? 3.0 : 2.35,c,dark ? .42 : .30);
+      const offset=lane*5.0;
+      for(let i=0;i<11;i++){
+        const q=(t*(.078+Math.abs(lane)*.003)+i/11+lane*.083)%1;
+        const p=lanePoint(N.s,N.n,-.15,q,offset);
+        const bright=(i+lane+13)%5===0;
+        const c=bright?'#ff6a31':'#FE2601';
+        sq(p.x+4,p.y,1.5,c,.07);
+        sq(p.x,p.y,bright?3.3:2.5,c,bright?.72:.48);
       }
     }
 
+    // Xining -> Nanjing: three neutral packet lanes
+    for(let lane=-1;lane<=1;lane++){
+      const offset=lane*5.5;
+      for(let i=0;i<9;i++){
+        const q=(t*(.060+Math.abs(lane)*.002)+i/9+lane*.11)%1;
+        const p=lanePoint(N.x,N.n,.045,q,offset);
+        const dark=(i+lane+8)%4===0;
+        const c=dark?'#383836':'#8b8b85';
+        sq(p.x+3.5,p.y,1.4,c,.055);
+        sq(p.x,p.y,dark?2.9:2.25,c,dark?.44:.30);
+      }
+    }
+
+    drawNode(N.s,'s');drawNode(N.n,'n');drawNode(N.x,'x');
     rctx.globalAlpha=1;
     if(!reduced)rraf=requestAnimationFrame(drawRegion);
   };
+
   const startRegion=()=>{if(!rraf&&onScreen&&visible())rraf=requestAnimationFrame(drawRegion);};
   if('ResizeObserver'in window)new ResizeObserver(()=>{resizeRegion();startRegion();}).observe(region);
   else window.addEventListener('resize',()=>{resizeRegion();startRegion();},{passive:true});
