@@ -42,9 +42,6 @@ if(visual.parentElement!==grid)grid.appendChild(visual);
 
 const palette=['#ff9a60','#ff6b34','#ff4b20','#FE2601','#dc2108','#b51a06','#252523'];
 
-// ---------------------------------------------------------------------------
-// HERO: one-way ambient flow + one-time logo reveal. No visible loopback.
-// ---------------------------------------------------------------------------
 const canvas=visual.querySelector('.hx-particle-canvas');
 const ctx=canvas?.getContext('2d',{alpha:true,desynchronized:true});
 if(canvas&&ctx){
@@ -131,7 +128,6 @@ if(canvas&&ctx){
     raf=0;if(!onScreen||!visible())return;
     const dt=Math.min(.032,Math.max(.001,(now-last||16)/1000));last=now;
     ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
-    const t=reduced ? 4.6 : now/1000;
     const elapsed=reduced ? 4.6 : (now-started)/1000;
     const reveal=smooth((elapsed-.35)/3.7);
     const front=logoBox.x+logoBox.w*(1-reveal);
@@ -167,12 +163,10 @@ if(canvas&&ctx){
       if(localReveal<=.002)return;
       const a=(.50+p.seed*.34)*localReveal;
       const c=palette[p.tone];
-      const x=p.x;
-      const y=p.y;
-      sq(x+4.5,y,p.size*.58,c,a*.08);
-      sq(x+2.2,y,p.size*.78,c,a*.16);
-      sq(x,y,p.size,c,a);
-      if(i%9===0)sq(x-1.1,y-1.1,p.size*.40,'#ffb88c',a*.26);
+      sq(p.x+4.5,p.y,p.size*.58,c,a*.08);
+      sq(p.x+2.2,p.y,p.size*.78,c,a*.16);
+      sq(p.x,p.y,p.size,c,a);
+      if(i%9===0)sq(p.x-1.1,p.y-1.1,p.size*.40,'#ffb88c',a*.26);
     });
 
     ctx.globalAlpha=1;
@@ -189,9 +183,6 @@ if(canvas&&ctx){
   resize();start();
 }
 
-// ---------------------------------------------------------------------------
-// THREE REGIONS: structured packet lanes. No clouds, no pulse, no route line.
-// ---------------------------------------------------------------------------
 const region=copy.querySelector('.hx-region-field');
 const rc=region?.querySelector('.hx-region-canvas');
 const rctx=rc?.getContext('2d',{alpha:false,desynchronized:true});
@@ -218,15 +209,15 @@ if(region&&rc&&rctx){
 
   const drawNode=(center,kind)=>{
     const p=point(center);
-    const main=kind==='n'?'#FE2601':kind==='x'?'#2d2d2b':'#8b8b86';
-    const ring=kind==='n'?'rgba(254,38,1,.18)':'rgba(70,70,67,.10)';
+    const main=kind==='n' ? '#FE2601' : (kind==='x' ? '#2d2d2b' : '#8b8b86');
+    const ring=kind==='n' ? 'rgba(254,38,1,.18)' : 'rgba(70,70,67,.10)';
     rctx.strokeStyle=ring;rctx.lineWidth=1;
     rctx.strokeRect(p.x-13,p.y-13,26,26);
     rctx.strokeRect(p.x-7,p.y-7,14,14);
     sq(p.x,p.y,6,main,.95);
     for(let i=0;i<8;i++){
-      const ox=((i%4)-1.5)*6,oy=(i<4?-1:1)*17;
-      sq(p.x+ox,p.y+oy,1.7,main,kind==='n'?.18:.10);
+      const ox=((i%4)-1.5)*6,oy=(i<4 ? -1 : 1)*17;
+      sq(p.x+ox,p.y+oy,1.7,main,kind==='n' ? .18 : .10);
     }
   };
 
@@ -236,34 +227,31 @@ if(region&&rc&&rctx){
     rctx.globalAlpha=1;rctx.fillStyle='#fff';rctx.fillRect(0,0,rw,rh);
     const t=reduced ? 2.5 : now/1000;
 
-    // very faint technical grid for structure, not decoration
     rctx.strokeStyle='rgba(35,35,33,.035)';rctx.lineWidth=1;
     for(let x=18;x<rw;x+=28){rctx.beginPath();rctx.moveTo(x,0);rctx.lineTo(x,rh);rctx.stroke();}
     for(let y=18;y<rh;y+=28){rctx.beginPath();rctx.moveTo(0,y);rctx.lineTo(rw,y);rctx.stroke();}
 
-    // Suzhou -> Nanjing: five parallel packet lanes
     for(let lane=-2;lane<=2;lane++){
       const offset=lane*5.0;
       for(let i=0;i<11;i++){
         const q=(t*(.078+Math.abs(lane)*.003)+i/11+lane*.083)%1;
         const p=lanePoint(N.s,N.n,-.15,q,offset);
         const bright=(i+lane+13)%5===0;
-        const c=bright?'#ff6a31':'#FE2601';
+        const c=bright ? '#ff6a31' : '#FE2601';
         sq(p.x+4,p.y,1.5,c,.07);
-        sq(p.x,p.y,bright?3.3:2.5,c,bright?.72:.48);
+        sq(p.x,p.y,bright ? 3.3 : 2.5,c,bright ? .72 : .48);
       }
     }
 
-    // Xining -> Nanjing: three neutral packet lanes
     for(let lane=-1;lane<=1;lane++){
       const offset=lane*5.5;
       for(let i=0;i<9;i++){
         const q=(t*(.060+Math.abs(lane)*.002)+i/9+lane*.11)%1;
         const p=lanePoint(N.x,N.n,.045,q,offset);
         const dark=(i+lane+8)%4===0;
-        const c=dark?'#383836':'#8b8b85';
+        const c=dark ? '#383836' : '#8b8b85';
         sq(p.x+3.5,p.y,1.4,c,.055);
-        sq(p.x,p.y,dark?2.9:2.25,c,dark?.44:.30);
+        sq(p.x,p.y,dark ? 2.9 : 2.25,c,dark ? .44 : .30);
       }
     }
 
