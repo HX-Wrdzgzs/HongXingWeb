@@ -8,7 +8,7 @@ const visual=hero?.querySelector('.hero-visual');
 if(!hero||!grid||!copy||!visual)return;
 
 const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false;
-const visible=()=>!document.hidden;
+const pageVisible=()=>!document.hidden;
 hero.classList.add('hx-shader-hero');
 
 copy.innerHTML=`
@@ -23,169 +23,285 @@ copy.innerHTML=`
     <div class="hx-region-label xining"><span><strong>青海西宁</strong><small>XINING · ACTIVE</small></span></div>
     <div class="hx-region-label suzhou"><span><strong>苏州</strong><small>SUZHOU · MIGRATING</small></span></div>
   </div>`;
-visual.innerHTML=`<div class="hx-particle-stage"><canvas class="hx-particle-canvas" aria-hidden="true"></canvas><div class="hx-particle-vignette"></div><div class="hx-particle-legend">PARTICLE FLOW · RIGHT → LEFT<br>LOGO ASSEMBLY · SERVICE FIELD</div></div>`;
-copy.classList.add('in');visual.classList.add('in');
+
+visual.innerHTML=`<div class="hx-particle-stage"><canvas class="hx-particle-canvas" aria-hidden="true"></canvas><div class="hx-particle-vignette"></div><div class="hx-particle-legend">RIGHT → LEFT PARTICLE FLOW<br>SLIDING LOGO REVEAL</div></div>`;
+copy.classList.add('in');
+visual.classList.add('in');
 Object.assign(copy.style,{opacity:'1',visibility:'visible',transform:'none'});
 Object.assign(visual.style,{opacity:'1',visibility:'visible',transform:'none'});
 if(visual.parentElement!==grid)grid.appendChild(visual);
 
-const palette=['#ff6a22','#ff3e12','#FE2601','#d81f05','#a91505','#242422'];
-const hash=n=>{const x=Math.sin(n*91.713+17.23)*43758.5453;return x-Math.floor(x)};
+const palette=['#ff8a45','#ff5a20','#ff3510','#FE2601','#d71e05','#9f1404','#242422'];
+const hash=n=>{const x=Math.sin(n*91.713+17.23)*43758.5453;return x-Math.floor(x);};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const easeOutCubic=t=>1-Math.pow(1-clamp(t,0,1),3);
+const easeInOut=t=>{t=clamp(t,0,1);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;};
 
-const canvas=visual.querySelector('.hx-particle-canvas');
-const ctx=canvas?.getContext('2d',{alpha:true,desynchronized:true});
-if(canvas&&ctx){
+// ---------------------------------------------------------------------------
+// HERO: the entire particle logo slides from right to left as one structure.
+// A reveal front travels through the moving logo from right to left.
+// ---------------------------------------------------------------------------
+const heroCanvas=visual.querySelector('.hx-particle-canvas');
+const hctx=heroCanvas?.getContext('2d',{alpha:true,desynchronized:true});
+if(heroCanvas&&hctx){
   const mask=document.createElement('canvas');
   const mctx=mask.getContext('2d',{willReadFrequently:true});
-  const logo=new Image();
-  let w=0,h=0,dpr=1,targets=[],particles=[],ambient=[],raf=0,onScreen=true,last=0,lastCycle=-1,logoReady=false;
+  const logoImg=new Image();
+  let w=0,h=0,dpr=1,logoPoints=[],ambient=[],raf=0,last=0,onScreen=true,logoReady=false;
 
-  const resetParticle=(p,i)=>{
-    p.x=w*(1.04+hash(i*7.1)*.38);
-    p.y=h*(.08+hash(i*11.9)*.84);
-    p.px=p.x;p.py=p.y;
-    p.vx=-(42+hash(i*5.7)*58);
-    p.size=1.8+hash(i*13.1)*2.8;
-    p.color=palette[Math.min(palette.length-1,Math.floor(hash(i*3.7)*palette.length))];
-  };
-
-  const rebuildLogo=()=>{
-    if(!logoReady||!w||!h)return;
-    mask.width=Math.max(1,Math.round(w));mask.height=Math.max(1,Math.round(h));
-    mctx.clearRect(0,0,w,h);
+  const rebuild=()=>{
+    if(!w||!h)return;
     const mobile=w<760;
-    const iw=logo.naturalWidth||1,ih=logo.naturalHeight||1;
-    const maxW=w*(mobile ? .80 : .42),maxH=h*(mobile ? .38 : .62);
+    ambient=Array.from({length:mobile?135:210},(_,i)=>({
+      x:hash(i*3.17)*w,
+      y:hash(i*8.33)*h,
+      vx:22+hash(i*6.11)*58,
+      size:1+hash(i*5.73)*2.6,
+      alpha:.055+hash(i*7.4)*.18,
+      color:palette[Math.floor(hash(i*4.8)*6)]
+    }));
+    if(!logoReady)return;
+
+    mask.width=Math.max(1,Math.round(w));
+    mask.height=Math.max(1,Math.round(h));
+    mctx.clearRect(0,0,mask.width,mask.height);
+    const iw=logoImg.naturalWidth||1;
+    const ih=logoImg.naturalHeight||1;
+    const maxW=w*(mobile?.68:.34);
+    const maxH=h*(mobile?.31:.58);
     const scale=Math.min(maxW/iw,maxH/ih);
-    const dw=iw*scale,dh=ih*scale;
-    const cx=w*(mobile ? .60 : .76),cy=h*(mobile ? .47 : .48);
-    const dx=cx-dw*.5,dy=cy-dh*.5;
-    mctx.drawImage(logo,dx,dy,dw,dh);
+    const dw=iw*scale;
+    const dh=ih*scale;
+    const targetCx=w*(mobile?.68:.78);
+    const targetCy=h*(mobile?.47:.48);
+    const dx=targetCx-dw*.5;
+    const dy=targetCy-dh*.5;
+    mctx.drawImage(logoImg,dx,dy,dw,dh);
     const data=mctx.getImageData(0,0,mask.width,mask.height).data;
-    const step=mobile?6:7;
-    const candidates=[];
+    const step=mobile?5:6;
+    const raw=[];
     for(let y=Math.max(0,Math.floor(dy));y<Math.min(h,Math.ceil(dy+dh));y+=step){
       for(let x=Math.max(0,Math.floor(dx));x<Math.min(w,Math.ceil(dx+dw));x+=step){
-        const a=data[(Math.floor(y)*mask.width+Math.floor(x))*4+3];
-        if(a>48)candidates.push({x,y,lx:(x-dx)/Math.max(1,dw)});
+        const idx=(Math.floor(y)*mask.width+Math.floor(x))*4+3;
+        if(data[idx]>52){
+          raw.push({
+            x:x,
+            y:y,
+            lx:(x-dx)/Math.max(1,dw),
+            seed:hash(raw.length*3.91)
+          });
+        }
       }
     }
-    const maxPoints=mobile?560:760;
-    const stride=Math.max(1,Math.ceil(candidates.length/maxPoints));
-    targets=candidates.filter((_,i)=>i%stride===0).slice(0,maxPoints);
-    particles=targets.map((t,i)=>{const p={tx:t.x,ty:t.y,lx:t.lx,phase:hash(i*2.9)*.35};resetParticle(p,i);return p;});
-
-    const ambientCount=mobile?105:155;
-    ambient=Array.from({length:ambientCount},(_,i)=>({
-      x:hash(i*3.1)*w,y:hash(i*7.9)*h,
-      vx:-(18+hash(i*5.2)*52),size:1+hash(i*9.3)*2.4,
-      alpha:.07+hash(i*4.2)*.20,color:palette[Math.floor(hash(i*8.4)*5)]
-    }));
-    lastCycle=-1;
+    const maxPoints=mobile?820:1100;
+    const stride=Math.max(1,Math.ceil(raw.length/maxPoints));
+    logoPoints=raw.filter((_,i)=>i%stride===0).slice(0,maxPoints);
   };
 
   const resize=()=>{
-    const r=visual.getBoundingClientRect();if(!r.width||!r.height)return;
-    const nextDpr=Math.min(window.devicePixelRatio||1,r.width<760?1:1.2);
-    const nw=Math.round(r.width*nextDpr),nh=Math.round(r.height*nextDpr);
-    if(nw===canvas.width&&nh===canvas.height)return;
-    w=r.width;h=r.height;dpr=nextDpr;canvas.width=nw;canvas.height=nh;ctx.setTransform(dpr,0,0,dpr,0,0);rebuildLogo();
+    const r=visual.getBoundingClientRect();
+    if(!r.width||!r.height)return;
+    const ndpr=Math.min(window.devicePixelRatio||1,r.width<760?1:1.18);
+    const nw=Math.max(1,Math.round(r.width*ndpr));
+    const nh=Math.max(1,Math.round(r.height*ndpr));
+    if(nw===heroCanvas.width&&nh===heroCanvas.height)return;
+    w=r.width;h=r.height;dpr=ndpr;
+    heroCanvas.width=nw;heroCanvas.height=nh;
+    hctx.setTransform(dpr,0,0,dpr,0,0);
+    rebuild();
   };
 
-  const drawSquare=(x,y,s,color,a)=>{ctx.globalAlpha=a;ctx.fillStyle=color;ctx.fillRect(Math.round(x-s*.5),Math.round(y-s*.5),s,s);ctx.globalAlpha=1;};
-  const drawHero=(now=0)=>{
-    raf=0;if(!onScreen||!visible())return;
-    const dt=Math.min(.034,Math.max(.001,(now-last||16)/1000));last=now;
-    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
-    const time=now/1000,cycleLen=10.8,cycle=Math.floor(time/cycleLen),phase=time%cycleLen;
-    if(cycle!==lastCycle){particles.forEach(resetParticle);lastCycle=cycle;}
+  const square=(x,y,s,c,a)=>{
+    hctx.globalAlpha=a;
+    hctx.fillStyle=c;
+    hctx.fillRect(Math.round(x-s*.5),Math.round(y-s*.5),s,s);
+    hctx.globalAlpha=1;
+  };
 
+  const drawHero=(now=0)=>{
+    raf=0;
+    if(!onScreen||!pageVisible())return;
+    const dt=Math.min(.034,Math.max(.001,(now-last||16)/1000));
+    last=now;
+    hctx.setTransform(dpr,0,0,dpr,0,0);
+    hctx.clearRect(0,0,w,h);
+    const t=reduced?5.1:now/1000;
+
+    // Continuous right-to-left ambient field.
     ambient.forEach((p,i)=>{
-      p.x+=p.vx*dt;
-      if(p.x<-8){p.x=w+8+hash(i+cycle)*w*.12;p.y=hash(i*13.7+cycle)*h;}
-      const fade=(p.x/w < .42 ? .52 : 1);
-      drawSquare(p.x+7,p.y,p.size*.72,p.color,p.alpha*.20*fade);
-      drawSquare(p.x,p.y,p.size,p.color,p.alpha*fade);
+      p.x-=p.vx*dt;
+      if(p.x<-12){p.x=w+12+hash(i+t*.1)*w*.16;p.y=hash(i*11.31+Math.floor(t))*h;}
+      const leftFade=clamp((p.x/w-.03)/.28,0,1);
+      square(p.x+7,p.y,p.size*.72,p.color,p.alpha*.17*leftFade);
+      square(p.x,p.y,p.size,p.color,p.alpha*leftFade);
     });
 
-    particles.forEach((p,i)=>{
-      const start=.35+(1-p.lx)*3.55+p.phase;
-      const assembling=phase>=start&&phase<8.15;
-      const dispersing=phase>=8.15;
-      p.px=p.x;p.py=p.y;
-      if(assembling){
-        const settle=Math.min(1,(phase-start)/1.25);
-        const ease=1-Math.exp(-dt*(3.8+settle*6.0));
-        p.x+=(p.tx-p.x)*ease;p.y+=(p.ty-p.y)*ease;
-      }else if(dispersing){
-        p.x+=(-90-hash(i*4.3)*80)*dt;
-        p.y+=Math.sin(time*1.6+i)*9*dt;
-      }else{
-        p.x+=p.vx*dt;
-      }
-      const life=dispersing?Math.max(0,1-(phase-8.15)/2.25):Math.min(1,Math.max(0,(phase-start)/.50));
-      if(life<=0)return;
-      const leftFade=(p.x/w < .45 ? .46 : 1);
-      const alpha=(.30+hash(i*6.2)*.58)*life*leftFade;
-      const color=palette[Math.floor(hash(i*2.37)*palette.length)];
-      const s=p.size*(.90+hash(i*8.1)*.42);
-      drawSquare(p.px+5,p.py,s*.76,color,alpha*.15);
-      drawSquare(p.x,p.y,s,color,alpha);
-      if(i%5===0)drawSquare(p.x+2.6,p.y-2.4,s*.46,'#ff8a4a',alpha*.30);
+    // Cycle: enter from right -> settle -> hold -> exit to left.
+    const cycleLen=11.2;
+    const phase=reduced?4.8:(t%cycleLen);
+    let groupOffset=0;
+    let groupAlpha=1;
+    if(phase<3.0){
+      const k=easeOutCubic(phase/3.0);
+      groupOffset=(1-k)*w*.78;
+    }else if(phase<7.7){
+      groupOffset=0;
+    }else{
+      const k=easeInOut((phase-7.7)/(cycleLen-7.7));
+      groupOffset=-k*w*.88;
+      groupAlpha=1-clamp((phase-9.7)/1.5,0,1);
+    }
+
+    // Reveal front is in logo-local X: right edge to left edge.
+    const revealProgress=phase<.45?0:easeInOut((phase-.45)/3.9);
+    const revealFront=1.12-revealProgress*1.34;
+
+    logoPoints.forEach((p,i)=>{
+      const reveal=clamp((p.lx-revealFront)/.13,0,1);
+      if(reveal<=0)return;
+      const shimmer=.86+.14*Math.sin(t*2.6+i*.37);
+      const alpha=(.30+p.seed*.62)*reveal*groupAlpha*shimmer;
+      const x=p.x+groupOffset;
+      const y=p.y;
+      if(x<-30||x>w+30)return;
+      const color=palette[Math.floor(hash(i*2.71)*palette.length)];
+      const size=2.1+hash(i*5.33)*2.8;
+      // short directional trail to make leftward movement visible
+      square(x+8,y,size*.66,color,alpha*.10);
+      square(x+4,y,size*.82,color,alpha*.18);
+      square(x,y,size,color,alpha);
+      if(i%6===0)square(x-1.8,y-1.6,size*.45,'#ff9a56',alpha*.34);
     });
 
     if(!reduced)raf=requestAnimationFrame(drawHero);
   };
-  const startHero=()=>{if(!raf&&onScreen&&visible())raf=requestAnimationFrame(drawHero);};
-  logo.onload=()=>{logoReady=true;rebuildLogo();startHero();};
-  logo.src='assets/img/hongxing-mark-exact.svg';
-  if('ResizeObserver'in window)new ResizeObserver(()=>{resize();startHero();}).observe(visual);else window.addEventListener('resize',()=>{resize();startHero();},{passive:true});
-  if('IntersectionObserver'in window)new IntersectionObserver(es=>{onScreen=es.some(e=>e.isIntersecting);if(onScreen)startHero();else if(raf){cancelAnimationFrame(raf);raf=0;}},{threshold:0}).observe(hero);
-  document.addEventListener('visibilitychange',()=>{if(visible())startHero();else if(raf){cancelAnimationFrame(raf);raf=0;}});
+
+  const startHero=()=>{if(!raf&&onScreen&&pageVisible())raf=requestAnimationFrame(drawHero);};
+  logoImg.onload=()=>{logoReady=true;rebuild();startHero();};
+  logoImg.src='assets/img/hongxing-mark-exact.svg';
+  if('ResizeObserver'in window)new ResizeObserver(()=>{resize();startHero();}).observe(visual);
+  else window.addEventListener('resize',()=>{resize();startHero();},{passive:true});
+  if('IntersectionObserver'in window)new IntersectionObserver(entries=>{
+    onScreen=entries.some(e=>e.isIntersecting);
+    if(onScreen)startHero();else if(raf){cancelAnimationFrame(raf);raf=0;}
+  },{threshold:0}).observe(hero);
+  document.addEventListener('visibilitychange',()=>{if(pageVisible())startHero();else if(raf){cancelAnimationFrame(raf);raf=0;}});
   resize();startHero();
 }else{
   visual.innerHTML='<div class="hx-logo-fallback"><img src="assets/img/hongxing-mark-exact.svg" alt="Hong Xing"></div>';
 }
 
+// ---------------------------------------------------------------------------
+// THREE REGIONS: explicitly light canvas, soft paths, multi-lane particle flow.
+// ---------------------------------------------------------------------------
 const region=copy.querySelector('.hx-region-field');
-const rc=region?.querySelector('.hx-region-canvas');
-const rctx=rc?.getContext('2d',{alpha:true,desynchronized:true});
-if(region&&rc&&rctx){
+const regionCanvas=region?.querySelector('.hx-region-canvas');
+const rctx=regionCanvas?.getContext('2d',{alpha:false,desynchronized:true});
+if(region&&regionCanvas&&rctx){
   let w=0,h=0,dpr=1,raf=0,last=0,onScreen=true;
   const node=(x,y)=>({x:x*w,y:y*h});
   const bez=(a,c,b,t)=>{const u=1-t;return{x:u*u*a.x+2*u*t*c.x+t*t*b.x,y:u*u*a.y+2*u*t*c.y+t*t*b.y};};
-  const curve=(from,to,bend,t,offset=0)=>{const a=node(from[0],from[1]),b=node(to[0],to[1]),c={x:(a.x+b.x)*.5,y:(a.y+b.y)*.5+h*bend+offset};return bez(a,c,b,t);};
-  const path=(from,to,bend,color,width,offset=0)=>{const a=node(from[0],from[1]),b=node(to[0],to[1]),c={x:(a.x+b.x)*.5,y:(a.y+b.y)*.5+h*bend+offset};rctx.beginPath();rctx.moveTo(a.x,a.y);rctx.quadraticCurveTo(c.x,c.y,b.x,b.y);rctx.strokeStyle=color;rctx.lineWidth=width;rctx.stroke();};
-  const square=(p,s,c,a)=>{rctx.globalAlpha=a;rctx.fillStyle=c;rctx.fillRect(Math.round(p.x-s*.5),Math.round(p.y-s*.5),s,s);rctx.globalAlpha=1;};
-  const resize=()=>{const r=region.getBoundingClientRect();if(!r.width||!r.height)return;const nd=Math.min(window.devicePixelRatio||1,r.width<760?1:1.15),nw=Math.round(r.width*nd),nh=Math.round(r.height*nd);if(nw===rc.width&&nh===rc.height)return;w=r.width;h=r.height;dpr=nd;rc.width=nw;rc.height=nh;rctx.setTransform(dpr,0,0,dpr,0,0);};
-  const draw=(now=0)=>{
-    raf=0;if(!onScreen||!visible())return;if(!reduced&&now-last<30){raf=requestAnimationFrame(draw);return;}last=now;
-    rctx.setTransform(dpr,0,0,dpr,0,0);rctx.clearRect(0,0,w,h);const t=reduced?3:now/1000;
-    for(let i=0;i<46;i++){const x=hash(i*2.1)*w,y=hash(i*7.3)*h,s=1.2+hash(i*5.1)*1.8,a=.018+hash(i*4.9)*.045;square({x,y},s,i%5===0?'#FE2601':'#6f6f6a',a);}
-    path([.10,.76],[.58,.22],-.18,'rgba(254,38,1,.16)',1.1,-5);
-    path([.10,.76],[.58,.22],-.18,'rgba(255,92,34,.08)',3.6,6);
-    path([.76,.76],[.58,.22],.05,'rgba(37,37,34,.12)',1.0,0);
-    path([.76,.76],[.58,.22],.05,'rgba(120,120,114,.06)',3.0,-6);
-
-    for(let lane=0;lane<2;lane++)for(let i=0;i<13;i++){
-      const q=(t*(lane?0.12:0.145)+i/13+lane*.12)%1,p=curve([.10,.76],[.58,.22],-.18,q,lane?7:-5);
-      const c=i%4===0?'#ff6a22':i%3===0?'#c91d06':'#FE2601',a=.26+.58*Math.sin(Math.PI*q);
-      square({x:p.x+7,y:p.y},2.4,c,a*.16);square(p,i%5===0?4.6:3.4,c,a);
-    }
-    for(let lane=0;lane<2;lane++)for(let i=0;i<8;i++){
-      const q=(t*(lane ? .07 : .085)+i/8+lane*.18)%1,p=curve([.76,.76],[.58,.22],.05,q,lane?-5:4),c=i%3===0?'#2b2b29':'#777772',a=.16+.40*Math.sin(Math.PI*q);
-      square({x:p.x+5,y:p.y},2.0,c,a*.15);square(p,2.8,c,a);
-    }
-    const pulse=.5+.5*Math.sin(t*2.2);
-    [{p:[.58,.22],c:'#FE2601',r:10+pulse*3},{p:[.76,.76],c:'#2d2d2b',r:8},{p:[.10,.76],c:'#777',r:8}].forEach((n,i)=>{
-      const p=node(n.p[0],n.p[1]);rctx.globalAlpha=(i===0 ? .18 : .10);rctx.strokeStyle=n.c;rctx.lineWidth=1;rctx.strokeRect(p.x-n.r,p.y-n.r,n.r*2,n.r*2);rctx.globalAlpha=1;
-    });
-    if(!reduced)raf=requestAnimationFrame(draw);
+  const curve=(from,to,bend,t,offset=0)=>{
+    const a=node(from[0],from[1]);
+    const b=node(to[0],to[1]);
+    const c={x:(a.x+b.x)*.5,y:(a.y+b.y)*.5+h*bend+offset};
+    return bez(a,c,b,t);
   };
-  const start=()=>{if(!raf&&onScreen&&visible())raf=requestAnimationFrame(draw);};
-  if('ResizeObserver'in window)new ResizeObserver(()=>{resize();start();}).observe(region);else window.addEventListener('resize',()=>{resize();start();},{passive:true});
-  if('IntersectionObserver'in window)new IntersectionObserver(es=>{onScreen=es.some(e=>e.isIntersecting);if(onScreen)start();else if(raf){cancelAnimationFrame(raf);raf=0;}},{threshold:0}).observe(region);
-  document.addEventListener('visibilitychange',()=>{if(visible())start();else if(raf){cancelAnimationFrame(raf);raf=0;}});
-  resize();start();
+  const path=(from,to,bend,color,width,offset=0)=>{
+    const a=node(from[0],from[1]);
+    const b=node(to[0],to[1]);
+    const c={x:(a.x+b.x)*.5,y:(a.y+b.y)*.5+h*bend+offset};
+    rctx.beginPath();rctx.moveTo(a.x,a.y);rctx.quadraticCurveTo(c.x,c.y,b.x,b.y);
+    rctx.strokeStyle=color;rctx.lineWidth=width;rctx.stroke();
+  };
+  const square=(p,s,c,a)=>{rctx.globalAlpha=a;rctx.fillStyle=c;rctx.fillRect(Math.round(p.x-s*.5),Math.round(p.y-s*.5),s,s);rctx.globalAlpha=1;};
+
+  const resizeRegion=()=>{
+    const r=region.getBoundingClientRect();
+    if(!r.width||!r.height)return;
+    const ndpr=Math.min(window.devicePixelRatio||1,r.width<760?1:1.12);
+    const nw=Math.round(r.width*ndpr),nh=Math.round(r.height*ndpr);
+    if(nw===regionCanvas.width&&nh===regionCanvas.height)return;
+    w=r.width;h=r.height;dpr=ndpr;
+    regionCanvas.width=nw;regionCanvas.height=nh;
+    rctx.setTransform(dpr,0,0,dpr,0,0);
+  };
+
+  const drawRegion=(now=0)=>{
+    raf=0;
+    if(!onScreen||!pageVisible())return;
+    if(!reduced&&now-last<30){raf=requestAnimationFrame(drawRegion);return;}
+    last=now;
+    rctx.setTransform(dpr,0,0,dpr,0,0);
+    rctx.globalAlpha=1;
+    rctx.fillStyle='#ffffff';
+    rctx.fillRect(0,0,w,h);
+    const t=reduced?3:now/1000;
+
+    // subtle background particles, never darken the field
+    for(let i=0;i<64;i++){
+      const x=hash(i*2.13)*w;
+      const y=hash(i*7.43)*h;
+      const s=1.2+hash(i*5.81)*1.6;
+      const a=.018+hash(i*4.17)*.052;
+      square({x,y},s,i%6===0?'#FE2601':'#9a9a95',a);
+    }
+
+    path([.10,.76],[.58,.22],-.18,'rgba(254,38,1,.19)',1.15,-6);
+    path([.10,.76],[.58,.22],-.18,'rgba(255,94,35,.09)',2.8,5);
+    path([.76,.76],[.58,.22],.05,'rgba(50,50,48,.14)',1.0,0);
+    path([.76,.76],[.58,.22],.05,'rgba(130,130,124,.07)',2.6,-6);
+
+    for(let lane=0;lane<3;lane++){
+      for(let i=0;i<11;i++){
+        const speed=lane===0?.145:lane===1?.125:.108;
+        const q=(t*speed+i/11+lane*.11)%1;
+        const p=curve([.10,.76],[.58,.22],-.18,q,(lane-1)*7);
+        const c=i%4===0?'#ff6a22':i%3===0?'#c91d06':'#FE2601';
+        const a=.22+.56*Math.sin(Math.PI*q);
+        square({x:p.x+6,y:p.y},2.0,c,a*.14);
+        square(p,i%5===0?4.2:3.1,c,a);
+      }
+    }
+
+    for(let lane=0;lane<2;lane++){
+      for(let i=0;i<9;i++){
+        const speed=lane===0?.082:.067;
+        const q=(t*speed+i/9+lane*.16)%1;
+        const p=curve([.76,.76],[.58,.22],.05,q,lane===0?4:-5);
+        const c=i%3===0?'#333331':'#858580';
+        const a=.15+.38*Math.sin(Math.PI*q);
+        square({x:p.x+5,y:p.y},1.8,c,a*.12);
+        square(p,2.7,c,a);
+      }
+    }
+
+    const pulse=.5+.5*Math.sin(t*2.2);
+    const nodes=[
+      {p:[.58,.22],c:'#FE2601',r:10+pulse*3,a:.18},
+      {p:[.76,.76],c:'#2d2d2b',r:8,a:.10},
+      {p:[.10,.76],c:'#777772',r:8,a:.10}
+    ];
+    nodes.forEach(n=>{
+      const p=node(n.p[0],n.p[1]);
+      rctx.globalAlpha=n.a;
+      rctx.strokeStyle=n.c;
+      rctx.lineWidth=1;
+      rctx.strokeRect(p.x-n.r,p.y-n.r,n.r*2,n.r*2);
+      rctx.globalAlpha=1;
+    });
+
+    if(!reduced)raf=requestAnimationFrame(drawRegion);
+  };
+
+  const startRegion=()=>{if(!raf&&onScreen&&pageVisible())raf=requestAnimationFrame(drawRegion);};
+  if('ResizeObserver'in window)new ResizeObserver(()=>{resizeRegion();startRegion();}).observe(region);
+  else window.addEventListener('resize',()=>{resizeRegion();startRegion();},{passive:true});
+  if('IntersectionObserver'in window)new IntersectionObserver(entries=>{
+    onScreen=entries.some(e=>e.isIntersecting);
+    if(onScreen)startRegion();else if(raf){cancelAnimationFrame(raf);raf=0;}
+  },{threshold:0}).observe(region);
+  document.addEventListener('visibilitychange',()=>{if(pageVisible())startRegion();else if(raf){cancelAnimationFrame(raf);raf=0;}});
+  resizeRegion();startRegion();
 }
 })();
