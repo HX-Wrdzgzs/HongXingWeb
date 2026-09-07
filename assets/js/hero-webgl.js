@@ -32,9 +32,6 @@ if(visual.parentElement!==grid)grid.appendChild(visual);
 const palette=['#ff6a22','#ff3e12','#FE2601','#d81f05','#a91505','#242422'];
 const hash=n=>{const x=Math.sin(n*91.713+17.23)*43758.5453;return x-Math.floor(x)};
 
-// ---------------------------------------------------------------------------
-// Layer 1: homepage particle field. It sits behind the copy on every viewport.
-// ---------------------------------------------------------------------------
 const canvas=visual.querySelector('.hx-particle-canvas');
 const ctx=canvas?.getContext('2d',{alpha:true,desynchronized:true});
 if(canvas&&ctx){
@@ -58,10 +55,10 @@ if(canvas&&ctx){
     mctx.clearRect(0,0,w,h);
     const mobile=w<760;
     const iw=logo.naturalWidth||1,ih=logo.naturalHeight||1;
-    const maxW=w*(mobile?.80:.42),maxH=h*(mobile?.38:.62);
+    const maxW=w*(mobile ? .80 : .42),maxH=h*(mobile ? .38 : .62);
     const scale=Math.min(maxW/iw,maxH/ih);
     const dw=iw*scale,dh=ih*scale;
-    const cx=w*(mobile?.60:.76),cy=h*(mobile?.47:.48);
+    const cx=w*(mobile ? .60 : .76),cy=h*(mobile ? .47 : .48);
     const dx=cx-dw*.5,dy=cy-dh*.5;
     mctx.drawImage(logo,dx,dy,dw,dh);
     const data=mctx.getImageData(0,0,mask.width,mask.height).data;
@@ -103,11 +100,10 @@ if(canvas&&ctx){
     const time=now/1000,cycleLen=10.8,cycle=Math.floor(time/cycleLen),phase=time%cycleLen;
     if(cycle!==lastCycle){particles.forEach(resetParticle);lastCycle=cycle;}
 
-    // Ambient stream establishes a permanent right-to-left direction.
     ambient.forEach((p,i)=>{
       p.x+=p.vx*dt;
       if(p.x<-8){p.x=w+8+hash(i+cycle)*w*.12;p.y=hash(i*13.7+cycle)*h;}
-      const fade=(p.x/w<.42?.52:1);
+      const fade=(p.x/w < .42 ? .52 : 1);
       drawSquare(p.x+7,p.y,p.size*.72,p.color,p.alpha*.20*fade);
       drawSquare(p.x,p.y,p.size,p.color,p.alpha*fade);
     });
@@ -129,7 +125,7 @@ if(canvas&&ctx){
       }
       const life=dispersing?Math.max(0,1-(phase-8.15)/2.25):Math.min(1,Math.max(0,(phase-start)/.50));
       if(life<=0)return;
-      const leftFade=p.x/w<.45?.46:1;
+      const leftFade=(p.x/w < .45 ? .46 : 1);
       const alpha=(.30+hash(i*6.2)*.58)*life*leftFade;
       const color=palette[Math.floor(hash(i*2.37)*palette.length)];
       const s=p.size*(.90+hash(i*8.1)*.42);
@@ -151,9 +147,6 @@ if(canvas&&ctx){
   visual.innerHTML='<div class="hx-logo-fallback"><img src="assets/img/hongxing-mark-exact.svg" alt="Hong Xing"></div>';
 }
 
-// ---------------------------------------------------------------------------
-// Independent three-region service flow. White information field, no logo.
-// ---------------------------------------------------------------------------
 const region=copy.querySelector('.hx-region-field');
 const rc=region?.querySelector('.hx-region-canvas');
 const rctx=rc?.getContext('2d',{alpha:true,desynchronized:true});
@@ -168,7 +161,6 @@ if(region&&rc&&rctx){
   const draw=(now=0)=>{
     raf=0;if(!onScreen||!visible())return;if(!reduced&&now-last<30){raf=requestAnimationFrame(draw);return;}last=now;
     rctx.setTransform(dpr,0,0,dpr,0,0);rctx.clearRect(0,0,w,h);const t=reduced?3:now/1000;
-    // restrained background field
     for(let i=0;i<46;i++){const x=hash(i*2.1)*w,y=hash(i*7.3)*h,s=1.2+hash(i*5.1)*1.8,a=.018+hash(i*4.9)*.045;square({x,y},s,i%5===0?'#FE2601':'#6f6f6a',a);}
     path([.10,.76],[.58,.22],-.18,'rgba(254,38,1,.16)',1.1,-5);
     path([.10,.76],[.58,.22],-.18,'rgba(255,92,34,.08)',3.6,6);
@@ -181,12 +173,12 @@ if(region&&rc&&rctx){
       square({x:p.x+7,y:p.y},2.4,c,a*.16);square(p,i%5===0?4.6:3.4,c,a);
     }
     for(let lane=0;lane<2;lane++)for(let i=0;i<8;i++){
-      const q=(t*(lane?.07:.085)+i/8+lane*.18)%1,p=curve([.76,.76],[.58,.22],.05,q,lane?-5:4),c=i%3===0?'#2b2b29':'#777772',a=.16+.40*Math.sin(Math.PI*q);
+      const q=(t*(lane ? .07 : .085)+i/8+lane*.18)%1,p=curve([.76,.76],[.58,.22],.05,q,lane?-5:4),c=i%3===0?'#2b2b29':'#777772',a=.16+.40*Math.sin(Math.PI*q);
       square({x:p.x+5,y:p.y},2.0,c,a*.15);square(p,2.8,c,a);
     }
     const pulse=.5+.5*Math.sin(t*2.2);
     [{p:[.58,.22],c:'#FE2601',r:10+pulse*3},{p:[.76,.76],c:'#2d2d2b',r:8},{p:[.10,.76],c:'#777',r:8}].forEach((n,i)=>{
-      const p=node(n.p[0],n.p[1]);rctx.globalAlpha=i===0?.18:.10;rctx.strokeStyle=n.c;rctx.lineWidth=1;rctx.strokeRect(p.x-n.r,p.y-n.r,n.r*2,n.r*2);rctx.globalAlpha=1;
+      const p=node(n.p[0],n.p[1]);rctx.globalAlpha=(i===0 ? .18 : .10);rctx.strokeStyle=n.c;rctx.lineWidth=1;rctx.strokeRect(p.x-n.r,p.y-n.r,n.r*2,n.r*2);rctx.globalAlpha=1;
     });
     if(!reduced)raf=requestAnimationFrame(draw);
   };
