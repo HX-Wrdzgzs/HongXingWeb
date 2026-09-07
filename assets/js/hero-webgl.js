@@ -47,10 +47,10 @@ if(heroCanvas&&hctx){
     mask.width=Math.max(1,Math.round(w));mask.height=Math.max(1,Math.round(h));
     mctx.clearRect(0,0,mask.width,mask.height);
     const iw=logoImg.naturalWidth||1,ih=logoImg.naturalHeight||1;
-    const maxW=w*(mobile?.72:.38),maxH=h*(mobile?.34:.62);
+    const maxW=w*(mobile ? .72 : .38),maxH=h*(mobile ? .34 : .62);
     const scale=Math.min(maxW/iw,maxH/ih);
     const dw=iw*scale,dh=ih*scale;
-    const cx=w*(mobile?.69:.79),cy=h*(mobile?.48:.49);
+    const cx=w*(mobile ? .69 : .79),cy=h*(mobile ? .48 : .49);
     const dx=cx-dw*.5,dy=cy-dh*.5;
     logoBox={x:dx,y:dy,w:dw,h:dh};
     mctx.drawImage(logoImg,dx,dy,dw,dh);
@@ -60,7 +60,7 @@ if(heroCanvas&&hctx){
   const buildParticles=()=>{
     if(!w||!h)return;
     const mobile=w<760;
-    const count=mobile?620:980;
+    const count=mobile ? 620 : 980;
     particles=Array.from({length:count},(_,i)=>({
       x:hash(i*3.17)*w,
       y:hash(i*7.93)*h,
@@ -74,13 +74,11 @@ if(heroCanvas&&hctx){
 
   const resizeHero=()=>{
     const r=visual.getBoundingClientRect();if(!r.width||!r.height)return;
-    const ndpr=Math.min(window.devicePixelRatio||1,r.width<760?1:1.15);
+    const ndpr=Math.min(window.devicePixelRatio||1,r.width<760 ? 1 : 1.15);
     const nw=Math.max(1,Math.round(r.width*ndpr)),nh=Math.max(1,Math.round(r.height*ndpr));
     if(nw===heroCanvas.width&&nh===heroCanvas.height)return;
-    w=r.width;h=r.height;dpr=ndpr;
-    heroCanvas.width=nw;heroCanvas.height=nh;
-    hctx.setTransform(dpr,0,0,dpr,0,0);
-    buildParticles();buildMask();
+    w=r.width;h=r.height;dpr=ndpr;heroCanvas.width=nw;heroCanvas.height=nh;
+    hctx.setTransform(dpr,0,0,dpr,0,0);buildParticles();buildMask();
   };
 
   const maskAt=(x,y)=>{
@@ -93,12 +91,11 @@ if(heroCanvas&&hctx){
     raf=0;if(!onScreen||!pageVisible())return;
     const dt=Math.min(.032,Math.max(.001,(now-last||16)/1000));last=now;
     hctx.setTransform(dpr,0,0,dpr,0,0);hctx.clearRect(0,0,w,h);
-    const t=reduced?5.2:now/1000;
-    const cycle=reduced?5.2:(t%10.4);
+    const t=reduced ? 5.2 : now/1000;
+    const cycle=reduced ? 5.2 : (t%10.4);
     let reveal=1,logoFade=1;
     if(cycle<.6)reveal=0;
     else if(cycle<4.2)reveal=smooth((cycle-.6)/3.6);
-    else reveal=1;
     if(cycle>8.4)logoFade=1-smooth((cycle-8.4)/1.7);
     const front=logoBox.x+logoBox.w*(1-reveal);
 
@@ -106,21 +103,18 @@ if(heroCanvas&&hctx){
       p.x-=p.speed*dt;
       if(p.x<-18){p.x=w+18+hash(i+Math.floor(t))*w*.12;p.y=hash(i*7.1+Math.floor(t)*.37)*h;}
       const inside=maskAt(p.x,p.y);
-      const passed=p.x>=front?1:0;
+      const passed=p.x>=front ? 1 : 0;
       const logoWeight=inside*passed*logoFade;
       const edgeWeight=clamp((p.x-(front-28))/28,0,1)*clamp(((front+18)-p.x)/18,0,1);
       const ambientA=p.alpha*(.34+.66*clamp((p.x/w-.02)/.32,0,1));
       let color=colors[p.tone],size=p.size,alpha=ambientA;
       if(logoWeight>.04){
-        size*=1.55+p.seed*.42;
-        alpha=.48+.46*p.seed;
-        if(p.seed<.16)color='#ff9a5e';
-        else if(p.seed>.88)color='#20201f';
+        size*=1.55+p.seed*.42;alpha=.48+.46*p.seed;
+        if(p.seed<.16)color='#ff9a5e';else if(p.seed>.88)color='#20201f';
       }else if(edgeWeight>.05){
-        alpha=Math.max(alpha,.22*edgeWeight);
-        color=p.seed<.72?'#ff4f1d':'#b91905';
+        alpha=Math.max(alpha,.22*edgeWeight);color=p.seed<.72 ? '#ff4f1d' : '#b91905';
       }
-      const trail=logoWeight>.04?.28:.11;
+      const trail=logoWeight>.04 ? .28 : .11;
       sq(p.x+10,p.y,size*.56,color,alpha*trail*.42);
       sq(p.x+5,p.y,size*.76,color,alpha*trail);
       sq(p.x,p.y,size,color,alpha);
@@ -129,6 +123,7 @@ if(heroCanvas&&hctx){
     hctx.globalAlpha=1;
     if(!reduced)raf=requestAnimationFrame(drawHero);
   };
+
   const startHero=()=>{if(!raf&&onScreen&&pageVisible())raf=requestAnimationFrame(drawHero);};
   logoImg.onload=()=>{logoReady=true;buildMask();startHero();};
   logoImg.src='assets/img/hongxing-mark-exact.svg';
@@ -140,7 +135,7 @@ if(heroCanvas&&hctx){
 
 const region=copy.querySelector('.hx-region-field');
 const rc=region?.querySelector('.hx-region-canvas');
-const rctx=rc?.getContext('2d',{alpha:false,desynchronized:true});
+const rctx=rc?.getContext('2d',{alpha:false});
 if(region&&rc&&rctx){
   let w=0,h=0,dpr=1,raf=0,last=0,onScreen=true,staticLayer=null;
   const nodes={s:[.11,.74],n:[.59,.23],x:[.77,.74]};
@@ -153,38 +148,37 @@ if(region&&rc&&rctx){
     staticLayer=document.createElement('canvas');staticLayer.width=rc.width;staticLayer.height=rc.height;
     const c=staticLayer.getContext('2d',{alpha:false});c.setTransform(dpr,0,0,dpr,0,0);
     c.fillStyle='#fff';c.fillRect(0,0,w,h);
-    const grad=c.createRadialGradient(w*.59,h*.23,4,w*.59,h*.23,h*.42);grad.addColorStop(0,'rgba(254,38,1,.050)');grad.addColorStop(1,'rgba(254,38,1,0)');c.fillStyle=grad;c.fillRect(0,0,w,h);
-    drawCurve(c,nodes.s,nodes.n,-.16,'rgba(254,38,1,.18)',1.1,-5);
-    drawCurve(c,nodes.s,nodes.n,-.16,'rgba(254,38,1,.055)',4.2,6);
-    drawCurve(c,nodes.x,nodes.n,.05,'rgba(42,42,40,.14)',1.0,0);
-    drawCurve(c,nodes.x,nodes.n,.05,'rgba(80,80,76,.045)',3.6,-6);
-    for(let i=0;i<28;i++){
+    const grad=c.createRadialGradient(w*.59,h*.23,4,w*.59,h*.23,h*.42);grad.addColorStop(0,'rgba(254,38,1,.044)');grad.addColorStop(1,'rgba(254,38,1,0)');c.fillStyle=grad;c.fillRect(0,0,w,h);
+    drawCurve(c,nodes.s,nodes.n,-.16,'rgba(254,38,1,.105)',.8,-5);
+    drawCurve(c,nodes.x,nodes.n,.05,'rgba(55,55,52,.085)',.8,0);
+    for(let i=0;i<18;i++){
       const x=hash(i*2.3)*w,y=hash(i*7.7)*h;
-      sq(c,x,y,1.5,i%6===0?'#FE2601':'#aaa9a4',i%6===0?.055:.032);
+      sq(c,x,y,1.4,i%6===0 ? '#FE2601' : '#b1b1ac',i%6===0 ? .045 : .026);
     }
   };
   const resizeRegion=()=>{
     const r=region.getBoundingClientRect();if(!r.width||!r.height)return;
-    const ndpr=Math.min(window.devicePixelRatio||1,r.width<760?1:1.1),nw=Math.round(r.width*ndpr),nh=Math.round(r.height*ndpr);
+    const ndpr=Math.min(window.devicePixelRatio||1,r.width<760 ? 1 : 1.1),nw=Math.round(r.width*ndpr),nh=Math.round(r.height*ndpr);
     if(nw===rc.width&&nh===rc.height)return;
     w=r.width;h=r.height;dpr=ndpr;rc.width=nw;rc.height=nh;rctx.setTransform(dpr,0,0,dpr,0,0);rebuildStatic();
   };
   const drawRegion=(now=0)=>{
     raf=0;if(!onScreen||!pageVisible())return;
-    if(!reduced&&now-last<32){raf=requestAnimationFrame(drawRegion);return;}last=now;
+    const dt=Math.min(.032,Math.max(.001,(now-last||16)/1000));last=now;
     rctx.setTransform(dpr,0,0,dpr,0,0);rctx.globalAlpha=1;rctx.fillStyle='#fff';rctx.fillRect(0,0,w,h);
     if(staticLayer)rctx.drawImage(staticLayer,0,0,staticLayer.width,staticLayer.height,0,0,w,h);
-    const t=reduced?3.4:now/1000;
-    for(let lane=0;lane<2;lane++)for(let i=0;i<12;i++){
-      const q=(t*(lane===0?.115:.094)+i/12+lane*.18)%1,p=curve(nodes.s,nodes.n,-.16,q,lane===0?-5:7);
-      const c=i%4===0?'#ff6126':i%3===0?'#c91d06':'#FE2601';
-      sq(rctx,p.x+5,p.y,2.0,c,.10);sq(rctx,p.x,p.y,i%5===0?4.0:3.0,c,.70);
+    const t=reduced ? 3.4 : now/1000;
+    for(let lane=0;lane<3;lane++)for(let i=0;i<10;i++){
+      const speed=lane===0 ? .112 : (lane===1 ? .094 : .079);
+      const q=(t*speed+i/10+lane*.17)%1,p=curve(nodes.s,nodes.n,-.16,q,(lane-1)*6);
+      const c=i%4===0 ? '#ff6126' : (i%3===0 ? '#c91d06' : '#FE2601');
+      sq(rctx,p.x+5,p.y,1.8,c,.08);sq(rctx,p.x,p.y,i%5===0 ? 3.8 : 2.9,c,.68);
     }
-    for(let lane=0;lane<2;lane++)for(let i=0;i<8;i++){
-      const q=(t*(lane===0?.072:.058)+i/8+lane*.21)%1,p=curve(nodes.x,nodes.n,.05,q,lane===0?0:-6),c=i%3===0?'#363634':'#85857f';
-      sq(rctx,p.x+4,p.y,1.8,c,.08);sq(rctx,p.x,p.y,2.7,c,.46);
+    for(let lane=0;lane<2;lane++)for(let i=0;i<7;i++){
+      const speed=lane===0 ? .070 : .056;
+      const q=(t*speed+i/7+lane*.22)%1,p=curve(nodes.x,nodes.n,.05,q,lane===0 ? 0 : -6),c=i%3===0 ? '#3b3b39' : '#898983';
+      sq(rctx,p.x+4,p.y,1.7,c,.06);sq(rctx,p.x,p.y,2.6,c,.42);
     }
-    hctx?.globalAlpha;
     rctx.globalAlpha=1;
     if(!reduced)raf=requestAnimationFrame(drawRegion);
   };
