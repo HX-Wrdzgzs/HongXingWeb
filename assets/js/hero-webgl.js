@@ -7,6 +7,13 @@ const copy=hero?.querySelector('.hero-copy');
 const visual=hero?.querySelector('.hero-visual');
 if(!hero||!grid||!copy||!visual)return;
 
+// Force the current hero stylesheet even if site-final.js still references an older cache key.
+document.querySelectorAll('link[href*="assets/css/hero-webgl.css"]').forEach(link=>link.remove());
+const heroCss=document.createElement('link');
+heroCss.rel='stylesheet';
+heroCss.href='assets/css/hero-webgl.css?v=20260907-2';
+document.head.appendChild(heroCss);
+
 const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false;
 const visible=()=>!document.hidden;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -58,7 +65,7 @@ if(!canvas||!ctx)return;
 const mask=document.createElement('canvas');
 const mctx=mask.getContext('2d',{willReadFrequently:true});
 const logo=new Image();
-let w=0,h=0,dpr=1,raf=0,onScreen=true,last=0,logoReady=false,maskData=null,box={x:0,y:0,w:0,h:0};
+let w=0,h=0,dpr=1,raf=0,onScreen=true,logoReady=false,maskData=null,box={x:0,y:0,w:0,h:0};
 const palette=['#ff8f55','#ff6430','#ff451c','#FE2601','#d91f07','#b31905','#242422'];
 
 const buildMask=()=>{
@@ -68,10 +75,10 @@ const buildMask=()=>{
   mask.height=Math.max(1,Math.round(h));
   mctx.clearRect(0,0,mask.width,mask.height);
   const iw=logo.naturalWidth||1,ih=logo.naturalHeight||1;
-  const maxW=w*(mobile?.78:.40),maxH=h*(mobile?.31:.60);
+  const maxW=w*(mobile ? .78 : .40),maxH=h*(mobile ? .31 : .60);
   const scale=Math.min(maxW/iw,maxH/ih);
   const dw=iw*scale,dh=ih*scale;
-  const cx=w*(mobile?.68:.78),cy=h*(mobile?.43:.48);
+  const cx=w*(mobile ? .68 : .78),cy=h*(mobile ? .43 : .48);
   const dx=cx-dw*.5,dy=cy-dh*.5;
   box={x:dx,y:dy,w:dw,h:dh};
   mctx.drawImage(logo,dx,dy,dw,dh);
@@ -86,7 +93,7 @@ const maskAt=(x,y)=>{
 const resize=()=>{
   const r=visual.getBoundingClientRect();
   if(!r.width||!r.height)return;
-  const ndpr=Math.min(window.devicePixelRatio||1,r.width<760?1:1.15);
+  const ndpr=Math.min(window.devicePixelRatio||1,r.width<760 ? 1 : 1.15);
   const nw=Math.max(1,Math.round(r.width*ndpr)),nh=Math.max(1,Math.round(r.height*ndpr));
   if(nw===canvas.width&&nh===canvas.height)return;
   w=r.width;h=r.height;dpr=ndpr;
@@ -103,13 +110,12 @@ const square=(x,y,s,color,a)=>{
 
 const draw=(now=0)=>{
   raf=0;if(!onScreen||!visible())return;
-  last=now;
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
-  const t=reduced?4.8:now/1000;
-  const spacing=w<760?8:9;
-  const speed=w<760?34:42;
-  const shift=reduced?0:(t*speed)%spacing;
-  const cycle=reduced?5.0:(t%10.8);
+  const t=reduced ? 4.8 : now/1000;
+  const spacing=w<760 ? 8 : 9;
+  const speed=w<760 ? 34 : 42;
+  const shift=reduced ? 0 : (t*speed)%spacing;
+  const cycle=reduced ? 5.0 : (t%10.8);
   let reveal=1,fade=1;
   if(cycle<.7)reveal=0;
   else if(cycle<4.6)reveal=smooth((cycle-.7)/3.9);
@@ -127,7 +133,7 @@ const draw=(now=0)=>{
       const x=gx*spacing-shift;
       if(x<-12||x>w+12)continue;
       const inside=maskAt(x,y);
-      const revealed=x>=front?1:0;
+      const revealed=x>=front ? 1 : 0;
       const logoWeight=inside*revealed*fade;
       const frontBand=1-clamp(Math.abs(x-front)/42,0,1);
       let alpha=.045+seed*.12;
@@ -140,7 +146,7 @@ const draw=(now=0)=>{
         else if(seed<.16)color='#ff9d67';
       }else if(frontBand>.02&&x>box.x-60&&x<box.x+box.w+60){
         alpha=Math.max(alpha,.18*frontBand);
-        color=seed>.82?'#b71b07':'#ff4c20';
+        color=seed>.82 ? '#b71b07' : '#ff4c20';
       }
       const leftFade=clamp((x/w-.03)/.25,0,1);
       alpha*=leftFade;
@@ -155,7 +161,7 @@ const draw=(now=0)=>{
 
 const start=()=>{if(!raf&&onScreen&&visible())raf=requestAnimationFrame(draw);};
 logo.onload=()=>{logoReady=true;buildMask();start();};
-logo.src='assets/img/hongxing-mark-exact.svg?v=20260907-1';
+logo.src='assets/img/hongxing-mark-exact.svg?v=20260907-2';
 if('ResizeObserver'in window)new ResizeObserver(()=>{resize();start();}).observe(visual);
 else window.addEventListener('resize',()=>{resize();start();},{passive:true});
 if('IntersectionObserver'in window)new IntersectionObserver(es=>{onScreen=es.some(e=>e.isIntersecting);if(onScreen)start();else if(raf){cancelAnimationFrame(raf);raf=0;}},{threshold:0}).observe(hero);
