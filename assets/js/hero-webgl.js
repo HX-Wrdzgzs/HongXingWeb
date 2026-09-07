@@ -40,9 +40,6 @@ Object.assign(copy.style,{opacity:'1',visibility:'visible',transform:'none'});
 Object.assign(visual.style,{opacity:'1',visibility:'visible',transform:'none'});
 if(visual.parentElement!==grid)grid.appendChild(visual);
 
-// ---------------------------------------------------------------------------
-// HERO: continuous ambient flow + stable logo particles revealed right -> left.
-// ---------------------------------------------------------------------------
 const canvas=visual.querySelector('.hx-particle-canvas');
 const ctx=canvas?.getContext('2d',{alpha:true,desynchronized:true});
 if(canvas&&ctx){
@@ -59,15 +56,15 @@ if(canvas&&ctx){
     mask.height=Math.max(1,Math.round(h));
     mctx.clearRect(0,0,mask.width,mask.height);
     const iw=logo.naturalWidth||1,ih=logo.naturalHeight||1;
-    const maxW=w*(mobile?.78:.40);
-    const maxH=h*(mobile?.31:.60);
+    const maxW=w*(mobile ? .78 : .40);
+    const maxH=h*(mobile ? .31 : .60);
     const scale=Math.min(maxW/iw,maxH/ih);
     const dw=iw*scale,dh=ih*scale;
-    const cx=w*(mobile?.68:.78),cy=h*(mobile?.43:.48);
+    const cx=w*(mobile ? .68 : .78),cy=h*(mobile ? .43 : .48);
     const dx=cx-dw*.5,dy=cy-dh*.5;
     mctx.drawImage(logo,dx,dy,dw,dh);
     const data=mctx.getImageData(0,0,mask.width,mask.height).data;
-    const step=mobile?5.5:6.2;
+    const step=mobile ? 5.5 : 6.2;
     const raw=[];
     for(let y=Math.max(0,dy);y<Math.min(h,dy+dh);y+=step){
       for(let x=Math.max(0,dx);x<Math.min(w,dx+dw);x+=step){
@@ -75,7 +72,7 @@ if(canvas&&ctx){
         if(a>48)raw.push({x,y,lx:(x-dx)/Math.max(1,dw)});
       }
     }
-    const maxPoints=mobile?900:1250;
+    const maxPoints=mobile ? 900 : 1250;
     const stride=Math.max(1,Math.ceil(raw.length/maxPoints));
     logoPoints=raw.filter((_,i)=>i%stride===0).slice(0,maxPoints).map((p,i)=>({
       ...p,
@@ -88,7 +85,7 @@ if(canvas&&ctx){
   const buildAmbient=()=>{
     if(!w||!h)return;
     const mobile=w<760;
-    const count=mobile?230:360;
+    const count=mobile ? 230 : 360;
     ambient=Array.from({length:count},(_,i)=>({
       x:hash(i*2.9,3)*w,
       y:hash(i*6.7,9)*h,
@@ -101,7 +98,7 @@ if(canvas&&ctx){
 
   const resize=()=>{
     const r=visual.getBoundingClientRect();if(!r.width||!r.height)return;
-    const ndpr=Math.min(window.devicePixelRatio||1,r.width<760?1:1.18);
+    const ndpr=Math.min(window.devicePixelRatio||1,r.width<760 ? 1 : 1.18);
     const nw=Math.max(1,Math.round(r.width*ndpr)),nh=Math.max(1,Math.round(r.height*ndpr));
     if(nw===canvas.width&&nh===canvas.height)return;
     w=r.width;h=r.height;dpr=ndpr;
@@ -121,7 +118,7 @@ if(canvas&&ctx){
     raf=0;if(!onScreen||!visible())return;
     const dt=Math.min(.032,Math.max(.001,(now-last||16)/1000));last=now;
     ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
-    const t=reduced?4.8:now/1000;
+    const t=reduced ? 4.8 : now/1000;
 
     ambient.forEach((p,i)=>{
       p.x-=p.speed*dt;
@@ -132,13 +129,13 @@ if(canvas&&ctx){
       sq(p.x,p.y,p.size,p.color,p.alpha*leftFade);
     });
 
-    const cycle=reduced?5.2:(t%11.2);
+    const cycle=reduced ? 5.2 : (t%11.2);
     let reveal=1,fade=1;
     if(cycle<.55)reveal=0;
     else if(cycle<4.5)reveal=smooth((cycle-.55)/3.95);
     if(cycle>9.4)fade=1-smooth((cycle-9.4)/1.5);
     const front=1.08-reveal*1.18;
-    const microDrift=reduced?0:Math.sin(t*.72)*.65;
+    const microDrift=reduced ? 0 : Math.sin(t*.72)*.65;
 
     logoPoints.forEach((p,i)=>{
       const localReveal=smooth((p.lx-front)/.12);
@@ -166,21 +163,17 @@ if(canvas&&ctx){
   resize();start();
 }
 
-// ---------------------------------------------------------------------------
-// THREE REGIONS: particle clouds and broad particle bands, no route lines.
-// ---------------------------------------------------------------------------
 const region=copy.querySelector('.hx-region-field');
 const rc=region?.querySelector('.hx-region-canvas');
 const rctx=rc?.getContext('2d',{alpha:false,desynchronized:true});
 if(region&&rc&&rctx){
-  let rw=0,rh=0,rdpr=1,rraf=0,last=0,onScreen=true;
+  let rw=0,rh=0,rdpr=1,rraf=0,onScreen=true;
   const N={s:[.12,.73],n:[.58,.25],x:[.78,.72]};
   const point=([x,y])=>({x:x*rw,y:y*rh});
   const bez=(a,c,b,t)=>{const u=1-t;return{x:u*u*a.x+2*u*t*c.x+t*t*b.x,y:u*u*a.y+2*u*t*c.y+t*t*b.y};};
   const bandPoint=(from,to,bend,t,lane)=>{
     const a=point(from),b=point(to),c={x:(a.x+b.x)*.5,y:(a.y+b.y)*.5+rh*bend};
-    const p=bez(a,c,b,t);
-    const p2=bez(a,c,b,Math.min(1,t+.01));
+    const p=bez(a,c,b,t),p2=bez(a,c,b,Math.min(1,t+.01));
     const dx=p2.x-p.x,dy=p2.y-p.y,len=Math.max(1,Math.hypot(dx,dy));
     return{x:p.x-dy/len*lane,y:p.y+dx/len*lane};
   };
@@ -188,7 +181,7 @@ if(region&&rc&&rctx){
 
   const resizeRegion=()=>{
     const r=region.getBoundingClientRect();if(!r.width||!r.height)return;
-    const ndpr=Math.min(window.devicePixelRatio||1,r.width<760?1:1.12);
+    const ndpr=Math.min(window.devicePixelRatio||1,r.width<760 ? 1 : 1.12);
     const nw=Math.round(r.width*ndpr),nh=Math.round(r.height*ndpr);
     if(nw===rc.width&&nh===rc.height)return;
     rw=r.width;rh=r.height;rdpr=ndpr;rc.width=nw;rc.height=nh;rctx.setTransform(rdpr,0,0,rdpr,0,0);
@@ -197,12 +190,12 @@ if(region&&rc&&rctx){
   const nodeCloud=(center,count,radius,colorA,colorB,seedBase)=>{
     const c=point(center);
     for(let i=0;i<count;i++){
-      const a=hash(seedBase+i*2.7,4)*Math.PI*2;
+      const angle=hash(seedBase+i*2.7,4)*Math.PI*2;
       const rr=Math.sqrt(hash(seedBase+i*4.1,8))*radius;
-      const x=c.x+Math.cos(a)*rr;
-      const y=c.y+Math.sin(a)*rr*.64;
+      const x=c.x+Math.cos(angle)*rr;
+      const y=c.y+Math.sin(angle)*rr*.64;
       const s=1.2+hash(seedBase+i*5.3,3)*2.3;
-      const col=hash(seedBase+i*7.9,12)>.28?colorA:colorB;
+      const col=hash(seedBase+i*7.9,12)>.28 ? colorA : colorB;
       const alpha=.08+hash(seedBase+i*8.8,6)*.22;
       sq(x,y,s,col,alpha);
     }
@@ -210,34 +203,32 @@ if(region&&rc&&rctx){
 
   const drawRegion=(now=0)=>{
     rraf=0;if(!onScreen||!visible())return;
-    const dt=Math.min(.032,Math.max(.001,(now-last||16)/1000));last=now;
     rctx.setTransform(rdpr,0,0,rdpr,0,0);rctx.globalAlpha=1;rctx.fillStyle='#fff';rctx.fillRect(0,0,rw,rh);
-    const t=reduced?2.8:now/1000;
+    const t=reduced ? 2.8 : now/1000;
 
-    // soft static node clouds
     nodeCloud(N.n,58,28,'#FE2601','#ff7a38',10);
     nodeCloud(N.s,28,19,'#9a9a94','#d9d9d4',120);
     nodeCloud(N.x,31,20,'#333330','#a7a7a1',240);
 
-    // Suzhou -> Nanjing: broad red particle band
     for(let lane=-3;lane<=3;lane++){
       for(let i=0;i<8;i++){
         const q=(t*(.070+Math.abs(lane)*.002)+i/8+lane*.071)%1;
         const p=bandPoint(N.s,N.n,-.15,q,lane*4.2);
         const bright=(i+lane+12)%4===0;
-        sq(p.x+4.5,p.y,1.6,bright?'#ff6b31':'#FE2601',.055);
-        sq(p.x,p.y,bright?3.5:2.5,bright?'#ff6b31':'#FE2601',bright?.68:.46);
+        const c=bright ? '#ff6b31' : '#FE2601';
+        sq(p.x+4.5,p.y,1.6,c,.055);
+        sq(p.x,p.y,bright ? 3.5 : 2.5,c,bright ? .68 : .46);
       }
     }
 
-    // Xining -> Nanjing: cooler neutral particle band
     for(let lane=-2;lane<=2;lane++){
       for(let i=0;i<7;i++){
         const q=(t*(.050+Math.abs(lane)*.002)+i/7+lane*.09)%1;
         const p=bandPoint(N.x,N.n,.045,q,lane*4.2);
         const dark=(i+lane+9)%3===0;
-        sq(p.x+3.5,p.y,1.5,dark?'#343432':'#8e8e88',.045);
-        sq(p.x,p.y,dark?3.0:2.35,dark?'#343432':'#8e8e88',dark?.42:.30);
+        const c=dark ? '#343432' : '#8e8e88';
+        sq(p.x+3.5,p.y,1.5,c,.045);
+        sq(p.x,p.y,dark ? 3.0 : 2.35,c,dark ? .42 : .30);
       }
     }
 
