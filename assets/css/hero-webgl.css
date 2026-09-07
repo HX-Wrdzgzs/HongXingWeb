@@ -35,13 +35,13 @@ body[data-page="home"] .hero>.wrap{max-width:none;width:100%;padding:0}
 .hx-logo-fallback img{width:min(64%,430px);height:auto;opacity:.95}
 @media(max-width:1050px){.hx-shader-hero .hero-grid{grid-template-columns:minmax(330px,.92fr) minmax(430px,1.08fr)}.hx-shader-hero .hero-copy{padding-right:28px}.hx-region-field{height:180px}}
 @media(max-width:760px){
- body[data-page="home"] .hero{min-height:0}
- .hx-shader-hero .hero-grid{display:block;min-height:0}
- .hx-shader-hero .hero-copy{min-height:0;padding:42px 26px 38px;background:#fff}
+ body[data-page="home"] .hero{min-height:0!important}
+ .hx-shader-hero .hero-grid{display:block!important;min-height:0!important}
+ .hx-shader-hero .hero-copy{display:flex!important;flex-direction:column!important;min-height:0!important;padding:42px 26px 38px;background:#fff}
  .hx-shader-hero .hero-copy:after{display:none}
  .hx-shader-hero .hero-copy h1{font-size:clamp(42px,13vw,58px);max-width:560px}
  .hx-shader-hero .hero-copy .formal-lead{font-size:13px!important;line-height:1.82!important}
- .hx-shader-hero .hero-visual{height:315px;min-height:315px;margin:28px -26px 0;border-top:1px solid #f2f2ee;border-bottom:1px solid #f0f0ec;background:radial-gradient(circle at 52% 48%,rgba(255,73,18,.14),rgba(254,38,1,.04) 36%,transparent 62%),#fff}
+ .hx-shader-hero .hero-copy>.hero-visual{order:0!important;display:block!important;width:calc(100% + 52px)!important;height:315px!important;min-height:315px!important;margin:28px -26px 0!important;border-top:1px solid #f2f2ee;border-bottom:1px solid #f0f0ec;background:radial-gradient(circle at 52% 48%,rgba(255,73,18,.14),rgba(254,38,1,.04) 36%,transparent 62%),#fff}
  .hx-shader-hero .hero-en{margin-top:22px}
  .hx-shader-hero .actions{margin-top:25px}
  .hx-shader-hero .primary{min-width:156px}
@@ -50,5 +50,5 @@ body[data-page="home"] .hero>.wrap{max-width:none;width:100%;padding:0}
  .hx-region-label.nanjing{left:55%;top:15%}.hx-region-label.xining{left:63%;top:70%}.hx-region-label.suzhou{left:5%;top:71%}
  .hx-particle-legend{display:none}
 }
-@media(max-width:480px){.hx-shader-hero .hero-copy{padding-top:36px}.hx-shader-hero .hero-visual{height:300px;min-height:300px;margin-top:24px}.hx-region-field{height:218px}.hx-region-label.nanjing{left:52%;top:15%}.hx-region-label.xining{left:61%;top:70%}.hx-region-label.suzhou{left:4%;top:72%}}
+@media(max-width:480px){.hx-shader-hero .hero-copy{padding-top:36px}.hx-shader-hero .hero-copy>.hero-visual{height:300px!important;min-height:300px!important;margin-top:24px!important}.hx-region-field{height:218px}.hx-region-label.nanjing{left:52%;top:15%}.hx-region-label.xining{left:61%;top:70%}.hx-region-label.suzhou{left:4%;top:72%}}
 @media(prefers-reduced-motion:reduce){.hx-particle-canvas,.hx-region-canvas{opacity:.92}}
