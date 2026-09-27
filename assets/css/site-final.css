@@ -274,3 +274,42 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 
 .hx-notice-signature{border-top:1px solid var(--line);margin-top:24px;padding-top:16px;color:var(--muted)!important;font-size:12px!important;font-weight:700}
 .hx-notice-panel-dark .hx-notice-signature{border-color:#444;color:#ccc!important}
+
+/* 2026-09-27 Chinese Fluent layout pass */
+.hero-grid{grid-template-columns:minmax(0,1.06fr) minmax(340px,.94fr);min-height:570px;padding:54px 0 62px;gap:36px}
+.hero-copy{max-width:680px;padding-right:0}
+.hero-kicker{display:block;color:#555;font-size:12px;letter-spacing:.14em;font-weight:800;margin-bottom:18px}
+.hero h1{font-size:clamp(42px,5vw,72px);line-height:1.02;letter-spacing:-.065em;margin:0 0 20px}
+.hero h1 em{font-style:normal;color:var(--red)}
+.hero p.formal-lead{font-size:18px;line-height:1.55;color:var(--ink);max-width:520px}
+.hero-en{letter-spacing:.08em}
+.hero-visual{min-height:420px}
+.nav-links{gap:18px}
+.nav-links a{font-size:13px}
+.hx-lifecycle-meta{display:block;color:var(--muted);font-size:11px;margin-top:9px}
+.hx-chart-title p{display:none}
+.hx-chart-name{position:sticky;left:0;z-index:3;white-space:normal;overflow:visible;background:#fff;box-shadow:5px 0 8px rgba(0,0,0,.04)}
+.hx-chart-head>div:first-child{position:sticky;left:0;z-index:4;background:#f1f1ef;box-shadow:5px 0 8px rgba(0,0,0,.05)}
+.hx-phase{white-space:normal;overflow-wrap:anywhere}
+.hx-notice-timeline-section .section-heading p{display:none}
+.hx-notice-summary-grid article{min-width:0}
+@media(max-width:1100px) and (min-width:761px){
+  body[data-page="home"] .hero-grid{display:grid!important;grid-template-columns:1fr 1fr!important;min-height:520px!important}
+  body[data-page="home"] .hero-visual{min-height:350px!important}
+}
+@media(max-width:760px){
+  body[data-page="home"] .hero{overflow:visible!important}
+  body[data-page="home"] .hero-grid{display:flex!important;flex-direction:column!important;min-height:0!important;padding:24px 0 28px!important;gap:0!important}
+  body[data-page="home"] .hero-copy{order:1!important;padding:0!important;width:100%!important}
+  body[data-page="home"] .hero-visual{order:2!important;min-height:180px!important;height:180px!important;margin-top:14px!important;width:100%!important}
+  body[data-page="home"] .mark-stage{width:min(190px,62vw)!important}
+  body[data-page="home"] .mark-shadow{bottom:10px!important;height:20px!important}
+  body[data-page="home"] .wave{display:none!important}
+  body[data-page="home"] .hero h1{font-size:40px!important}
+  body[data-page="home"] .hero p.formal-lead{font-size:17px!important;line-height:1.5!important}
+  body[data-page="home"] .hero-en{font-size:11px!important;letter-spacing:.05em!important}
+  .hx-notice-summary-head{display:block}
+  .hx-notice-summary-head .text-link{display:inline-block;margin-top:14px}
+  .hx-chart-scroll{margin-right:-14px}
+  .hx-chart-name{min-width:210px}
+}

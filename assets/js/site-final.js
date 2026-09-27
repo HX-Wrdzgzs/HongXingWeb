@@ -14,7 +14,7 @@
       body[data-page="home"] .hero{min-height:0!important}
       body[data-page="home"] .hero-grid{display:flex!important;flex-direction:column!important;min-height:0!important;padding:0!important;gap:0!important}
       body[data-page="home"] .hero-copy{order:1!important;min-height:0!important}
-      body[data-page="home"] .hero-visual{order:2!important;min-height:390px!important;height:390px!important}
+      body[data-page="home"] .hero-visual{order:2!important;min-height:180px!important;height:180px!important}
     }
   `;
   d.head.appendChild(rescue);
