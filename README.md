@@ -35,3 +35,12 @@ Hong Xing 技术 / 项目 / 服务官网。
 - Production domain: `hx.mizuki.top`
 
 开发阶段 HTML / CSS / JS 采用重新验证缓存策略，减少 Cloudflare Pages 更新后仍显示旧资源的问题。
+
+
+## 2026 年 9 月服务事件与生命周期
+
+- `notices.html`：两份 2026 年 9 月服务公告、事件时间线与信息边界说明。
+- `updates.html`：公告归档，置顶显示本次攻击处置与恢复记录。
+- `lifecycle.html`：依据 `https://help.mizuki.top/status` 整理的 2022–2030 生命周期图与文字说明。
+- 公告文字按照团队发布内容展示；攻击来源、攻击路径和实时服务可用性不在页面中擅自推断。
+- HongXingOS 7 在 2026-09-24 恢复公告中被提及，但未出现在公开生命周期图表中，因此只在事件公告中记录。
